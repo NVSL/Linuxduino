@@ -1,13 +1,13 @@
 # Linuxduino
 
-CURRENT 
+__CURRENT__ 
 * Currently working on testing all the javascript functions and working with a "secret porject" :D. 
 
-TODO 
+__TODO__
 * Write documentation / tutorials. 
 * Add Samsung Artik 710 specific hardware. 
 
-SPECIIFC HARDWARE SUPPORT 
+__SPECIFIC HARDWARE SUPPORT__
 
 | Platform | Specific hardware added |
 | ------ | ----------- |
