@@ -1,7 +1,8 @@
 # Linuxduino
 
 __CURRENT__ 
-* Currently working on testing all the javascript functions and working with a "secret porject" :D. 
+* Currently working on testing all the javascript functions.
+* Testing pthreads with emscripten -Critical-.
 
 __TODO__
 * Write documentation / tutorials. 
