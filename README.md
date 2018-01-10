@@ -2,7 +2,8 @@
 
 __CURRENT__ 
 * Currently working on testing all the javascript functions.
-* Testing pthreads with emscripten -Critical-.
+* Testing pthreads with emscripten -Critical!-.
+* Add Linuxduino.js to npm after tests. 
 
 __TODO__
 * Write documentation / tutorials. 
