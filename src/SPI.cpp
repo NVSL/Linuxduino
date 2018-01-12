@@ -150,11 +150,7 @@ void SPILinux::begin(std::string spiDeviceName)
 
 void SPILinux::begin(const char *spiDeviceName)
 {
-    FILE *fp;
-    char path[1024];
-    char *filename;
-    char *spiDevice;
-    char *tmpspiDevice = NULL;
+    char spiDeviceNamePath[128];
     uint8_t bitsPerWord = 8;
 
     // If SPI device name is empty return an error
@@ -165,15 +161,32 @@ void SPILinux::begin(const char *spiDeviceName)
         exit(1);
     }
 
-    // Set user given SPI device name
-    asprintf(&spiDevice, "%s", spiDeviceName);
+    // Here we change the path from /dev/... to /devices/...
+    // see github issue #1 (https://github.com/NVSL/Linuxduino/issues/1)
+#ifdef __EMSCRIPTEN__
+    // Webassembly
+    char devPath[4];
+    char restOfPath[124];
+    sscanf((char *)spiDeviceName, "%*c%3[^/]%124s", devPath, restOfPath);
+    devPath[3] = '\0';
+    restOfPath[123] = '\0';
+    if (strcmp(devPath, "dev") == 0) {
+        // Replace /dev with /devices
+        strcpy(spiDeviceNamePath, "/devices");
+        strcat(spiDeviceNamePath, restOfPath);
+    } else {
+        strcpy(spiDeviceNamePath, spiDeviceName);
+    }
+#else
+    // C++
+    strcpy(spiDeviceNamePath, spiDeviceName);
+#endif
 
-    // Open /dev/spidevX.X device 
-    asprintf(&filename, "%s", spiDevice);
-    fd = open(filename, O_RDWR);
+    // Open SPI port
+    fd = open(spiDeviceNamePath, O_RDWR);
     if (fd < 0) {
         fprintf(stderr, "SPI.%s(): error opening SPI device %s: %s\n",
-            __func__, filename, strerror (errno));
+            __func__, spiDeviceName, strerror (errno));
         exit(1);
     }
 

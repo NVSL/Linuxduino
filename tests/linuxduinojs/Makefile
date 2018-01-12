@@ -9,13 +9,13 @@ DIRSOURCES= $(IDIR)/Core.cpp $(IDIR)/Serial.cpp $(IDIR)/WString.cpp $(IDIR)/SPI.
 JSLIBRARY=$(IDIR)/library_ioctls.js
 # TARGETS  
 TARGETS=
-WASM_TARGETS= serial.js
+WASM_TARGETS= linuxduino.js
 
 all: $(TARGETS)
 all.js: $(WASM_TARGETS)
 
-# serial
-serial.js:
+# linuxduino
+linuxduino.js:
 	$(EMCC) $(EMFLAGS) $(DIRSOURCES) $(addsuffix .cpp, $(basename $@)) -s WASM=1 $< -o $@ --js-library $(JSLIBRARY)
 
 

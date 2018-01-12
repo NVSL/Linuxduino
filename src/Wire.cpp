@@ -148,14 +148,10 @@ void WireLinux::begin(std::string i2cDeviceName)
     begin(i2cDeviceName.c_str());
 }
 
-// Initialize the Wire library
+// Initialize Wire/I2C
 void WireLinux::begin(const char *i2cDeviceName)
 {
-    FILE *fn, *fp;
-    char path[1024];
-    char *filename;
-    char *i2cDevice;
-    char *tmpi2cDevice = NULL;
+    char i2cDeviceNamePath[128];
 
     // If I2C device name is empty return an error
     if (strcmp(i2cDeviceName, "") == 0) {
@@ -165,15 +161,32 @@ void WireLinux::begin(const char *i2cDeviceName)
         exit(1);
     }
     
-    // Set user given i2c device name
-    asprintf(&i2cDevice, "%s", i2cDeviceName);
+    // Here we change the path from /dev/... to /devices/...
+    // see github issue #1 (https://github.com/NVSL/Linuxduino/issues/1)
+#ifdef __EMSCRIPTEN__
+    // Webassembly
+    char devPath[4];
+    char restOfPath[124];
+    sscanf((char *)i2cDeviceName, "%*c%3[^/]%124s", devPath, restOfPath);
+    devPath[3] = '\0';
+    restOfPath[123] = '\0';
+    if (strcmp(devPath, "dev") == 0) {
+        // Replace /dev with /devices
+        strcpy(i2cDeviceNamePath, "/devices");
+        strcat(i2cDeviceNamePath, restOfPath);
+    } else {
+        strcpy(i2cDeviceNamePath, i2cDeviceName);
+    }
+#else
+    // C++
+    strcpy(i2cDeviceNamePath, i2cDeviceName);
+#endif
 
-    // Open i2c device name (e.g /dev/i2c-x)
-    asprintf(&filename,"%s", i2cDevice);
-    fd = open(filename, O_RDWR);
+    // Open I2C port
+    fd = open(i2cDeviceNamePath, O_RDWR);
     if (fd < 0) {
         fprintf(stderr, "Wire.%s(): error openning I2C device %s: %s\n",
-            __func__, filename, strerror (errno));
+            __func__, i2cDeviceName, strerror (errno));
         exit(1);
     }
 
@@ -411,8 +424,8 @@ WireLinux Wire = WireLinux();
             .function("requestFrom", &WireLinux::requestFrom)
             .function("beginTransmission", &WireLinux::beginTransmission)
             .function("endTransmission", &WireLinux::endTransmission)
-            // Wire.write(uint8_t) :: NO TYPE OVERLOAD WITH EMBIND (Added as write_char)
-            .function("write_char", select_overload<size_t(uint8_t)>(&WireLinux::write))
+            // Wire.write(uint8_t) :: NO TYPE OVERLOAD WITH EMBIND (Added as write_byte)
+            .function("write_byte", select_overload<size_t(uint8_t)>(&WireLinux::write))
             .function("write", select_overload<size_t(std::string)>(&WireLinux::write))
             .function("write", &WireLinux::write_js)
             .function("available", &WireLinux::available)

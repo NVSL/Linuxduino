@@ -112,6 +112,7 @@ void SerialLinux::begin(std::string serialPort, int baud)
 // Sets the data rate in bits per second (baud) for serial data transmission
 void SerialLinux::begin(const char *serialPort, int baud, unsigned char config)
 {
+    char serialPortPath[128];
     int speed;
     int DataSize, ParityEN, Parity, StopBits;
     struct termios options;
@@ -125,9 +126,30 @@ void SerialLinux::begin(const char *serialPort, int baud, unsigned char config)
         exit(1);
     }
 
+    // Here we change the path from /dev/... to /devices/...
+    // see github issue #1 (https://github.com/NVSL/Linuxduino/issues/1)
+#ifdef __EMSCRIPTEN__
+    // Webassembly
+    char devPath[4];
+    char restOfPath[124];
+    sscanf((char *)serialPort, "%*c%3[^/]%124s", devPath, restOfPath);
+    devPath[3] = '\0';
+    restOfPath[123] = '\0';
+    if (strcmp(devPath, "dev") == 0) {
+        // Replace /dev with /devices
+        strcpy(serialPortPath, "/devices");
+        strcat(serialPortPath, restOfPath);
+    } else {
+        strcpy(serialPortPath, serialPort);
+    }
+#else
+    // C++
+    strcpy(serialPortPath, serialPort);
+#endif
+
 
     // Open Serial port 
-    if ((fd = open(serialPort, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
+    if ((fd = open(serialPortPath, O_RDWR | O_NOCTTY | O_NONBLOCK)) == -1) {
         fprintf(stderr,"Serial.%s(): Unable to open the serial port %s: %s\n",
             __func__, serialPort, strerror (errno));
         exit(1);
@@ -968,8 +990,8 @@ SerialLinux Serial = SerialLinux();
             .function("peek", &SerialLinux::peek)
             .function("print",
                  select_overload<size_t(std::string)>(&SerialLinux::print))
-            // Serial.print(char) :: NO TYPE OVERLAD WITH EMBIND (Added as print_char)
-            .function("print_char",
+            // Serial.print(char) :: NO TYPE OVERLAD WITH EMBIND (Added as print_byte)
+            .function("print_byte",
                  select_overload<size_t(char)>(&SerialLinux::print))
             .function("print",
                  select_overload<size_t(unsigned char, int)>(&SerialLinux::print))
@@ -979,8 +1001,8 @@ SerialLinux Serial = SerialLinux();
                  select_overload<size_t(unsigned int, int)>(&SerialLinux::print))
             .function("println",
                  select_overload<size_t(std::string)>(&SerialLinux::println))
-            // Serial.println(char) :: NO TYPE OVERLAD WITH EMBIND (Added as println_char)
-            .function("println_char",
+            // Serial.println(char) :: NO TYPE OVERLAD WITH EMBIND (Added as println_byte)
+            .function("println_byte",
                  select_overload<size_t(char)>(&SerialLinux::println))
             .function("println",
                  select_overload<size_t(unsigned char, int)>(&SerialLinux::println))
@@ -996,8 +1018,8 @@ SerialLinux Serial = SerialLinux();
             .function("readStringUntil", &SerialLinux::readStringUntil_std)
             .function("readStringCommand", &SerialLinux::readStringCommand_js)
             .function("setTimeout", &SerialLinux::setTimeout)
-            // Serial.write(uint8_t) :: NO TYPE OVERLAD WITH EMBIND (Added as write_char)
-            .function("write_char",
+            // Serial.write(uint8_t) :: NO TYPE OVERLAD WITH EMBIND (Added as write_byte)
+            .function("write_byte",
                  select_overload<size_t(uint8_t)>(&SerialLinux::write))
             .function("write",
                  select_overload<size_t(std::string)>(&SerialLinux::write))

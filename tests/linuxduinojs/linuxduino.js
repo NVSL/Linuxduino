@@ -1,3 +1,9 @@
+try {
+  // Try to load electron if available for electron compatibility.
+  const {webFrame} = require('electron');
+  webFrame.registerURLSchemeAsPrivileged('file');
+} catch(err) {};
+
 // The Module object: Our interface to the outside world. We import
 // and export values on it, and do the work to get that through
 // closure compiler if necessary. There are various ways Module can be used:
@@ -27,6 +33,8 @@ for (var key in Module) {
     moduleOverrides[key] = Module[key];
   }
 }
+
+Module['ENVIRONMENT'] = 'NODE';
 
 // The environment setup code below is customized to use Module.
 // *** Environment setup code ***
@@ -1621,9 +1629,21 @@ function integrateWasmJS(Module) {
   var method = Module['wasmJSMethod'] || 'native-wasm';
   Module['wasmJSMethod'] = method;
 
-  var wasmTextFile = Module['wasmTextFile'] || 'serial.wast';
-  var wasmBinaryFile = Module['wasmBinaryFile'] || 'serial.wasm';
-  var asmjsCodeFile = Module['asmjsCodeFile'] || 'serial.temp.asm.js';
+  var wasmTextFile = Module['wasmTextFile'] || 'linuxduino.wast';
+  
+  // Note: This line was changed for linuxduino to work with npm
+  // to load files from different directories
+  // currently this is the only solution I found now.. see
+  // https://github.com/kripken/emscripten/issues/5342
+  if (typeof window === 'object') {
+    // If running Electron+Node
+    var wasmBinaryFile = Module['wasmBinaryFile'] || 'serial.wasm';
+  } else {
+    // If running Node
+    var wasmBinaryFile = Module['wasmBinaryFile'] || (__dirname+'/serial.wasm');
+  }
+  
+  var asmjsCodeFile = Module['asmjsCodeFile'] || 'linuxduino.temp.asm.js';
 
   if (typeof Module['locateFile'] === 'function') {
     wasmTextFile = Module['locateFile'](wasmTextFile);
@@ -2004,16 +2024,16 @@ function _emscripten_asm_const_i(code) {
 
 STATIC_BASE = Runtime.GLOBAL_BASE;
 
-STATICTOP = STATIC_BASE + 16128;
+STATICTOP = STATIC_BASE + 16944;
 /* global initializers */  __ATINIT__.push({ func: function() { __GLOBAL__sub_I_Core_cpp() } }, { func: function() { __GLOBAL__sub_I_Serial_cpp() } }, { func: function() { __GLOBAL__sub_I_SPI_cpp() } }, { func: function() { __GLOBAL__sub_I_Wire_cpp() } }, { func: function() { __GLOBAL__sub_I_bind_cpp() } });
 
 
-memoryInitializer = Module["wasmJSMethod"].indexOf("asmjs") >= 0 || Module["wasmJSMethod"].indexOf("interpret-asm2wasm") >= 0 ? "serial.js.mem" : null;
+memoryInitializer = Module["wasmJSMethod"].indexOf("asmjs") >= 0 || Module["wasmJSMethod"].indexOf("interpret-asm2wasm") >= 0 ? "linuxduino.js.mem" : null;
 
 
 
 
-var STATIC_BUMP = 16128;
+var STATIC_BUMP = 16944;
 Module["STATIC_BASE"] = STATIC_BASE;
 Module["STATIC_BUMP"] = STATIC_BUMP;
 
@@ -7467,9 +7487,9 @@ function nullFunc_v(x) { Module["printErr"]("Invalid function pointer called wit
 
 function nullFunc_viiii(x) { Module["printErr"]("Invalid function pointer called with signature 'viiii'. Perhaps this is an invalid value (e.g. caused by calling a virtual method on a NULL pointer)? Or calling a function with an incorrect type, which will fail? (it is worth building your source files with -Werror (warnings are errors), as warnings can indicate undefined behavior which can cause this)");  Module["printErr"]("Build with ASSERTIONS=2 for more info.");abort(x) }
 
-Module['wasmTableSize'] = 4001;
+Module['wasmTableSize'] = 4129;
 
-Module['wasmMaxTableSize'] = 4001;
+Module['wasmMaxTableSize'] = 4129;
 
 function invoke_viiiii(index,a1,a2,a3,a4,a5) {
   try {
@@ -7706,22 +7726,16 @@ var real____cxa_is_pointer_type = asm["___cxa_is_pointer_type"]; asm["___cxa_is_
   return real____cxa_is_pointer_type.apply(null, arguments);
 };
 
-var real____errno_location = asm["___errno_location"]; asm["___errno_location"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real____errno_location.apply(null, arguments);
-};
-
 var real__sbrk = asm["_sbrk"]; asm["_sbrk"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return real__sbrk.apply(null, arguments);
 };
 
-var real___GLOBAL__sub_I_Wire_cpp = asm["__GLOBAL__sub_I_Wire_cpp"]; asm["__GLOBAL__sub_I_Wire_cpp"] = function() {
+var real____errno_location = asm["___errno_location"]; asm["___errno_location"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real___GLOBAL__sub_I_Wire_cpp.apply(null, arguments);
+  return real____errno_location.apply(null, arguments);
 };
 
 var real_stackAlloc = asm["stackAlloc"]; asm["stackAlloc"] = function() {
@@ -7748,16 +7762,22 @@ var real_setTempRet0 = asm["setTempRet0"]; asm["setTempRet0"] = function() {
   return real_setTempRet0.apply(null, arguments);
 };
 
+var real___GLOBAL__sub_I_Wire_cpp = asm["__GLOBAL__sub_I_Wire_cpp"]; asm["__GLOBAL__sub_I_Wire_cpp"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return real___GLOBAL__sub_I_Wire_cpp.apply(null, arguments);
+};
+
 var real___GLOBAL__sub_I_Core_cpp = asm["__GLOBAL__sub_I_Core_cpp"]; asm["__GLOBAL__sub_I_Core_cpp"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return real___GLOBAL__sub_I_Core_cpp.apply(null, arguments);
 };
 
-var real__emscripten_get_global_libc = asm["_emscripten_get_global_libc"]; asm["_emscripten_get_global_libc"] = function() {
+var real_stackRestore = asm["stackRestore"]; asm["stackRestore"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real__emscripten_get_global_libc.apply(null, arguments);
+  return real_stackRestore.apply(null, arguments);
 };
 
 var real____getTypeName = asm["___getTypeName"]; asm["___getTypeName"] = function() {
@@ -7770,12 +7790,6 @@ var real_stackSave = asm["stackSave"]; asm["stackSave"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return real_stackSave.apply(null, arguments);
-};
-
-var real___Z3loli = asm["__Z3loli"]; asm["__Z3loli"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real___Z3loli.apply(null, arguments);
 };
 
 var real____cxa_can_catch = asm["___cxa_can_catch"]; asm["___cxa_can_catch"] = function() {
@@ -7802,10 +7816,10 @@ var real___GLOBAL__sub_I_SPI_cpp = asm["__GLOBAL__sub_I_SPI_cpp"]; asm["__GLOBAL
   return real___GLOBAL__sub_I_SPI_cpp.apply(null, arguments);
 };
 
-var real_stackRestore = asm["stackRestore"]; asm["stackRestore"] = function() {
+var real__emscripten_get_global_libc = asm["_emscripten_get_global_libc"]; asm["_emscripten_get_global_libc"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return real_stackRestore.apply(null, arguments);
+  return real__emscripten_get_global_libc.apply(null, arguments);
 };
 
 var real__malloc = asm["_malloc"]; asm["_malloc"] = function() {
@@ -7840,10 +7854,6 @@ var ___cxa_is_pointer_type = Module["___cxa_is_pointer_type"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["___cxa_is_pointer_type"].apply(null, arguments) };
-var ___errno_location = Module["___errno_location"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["___errno_location"].apply(null, arguments) };
 var _memset = Module["_memset"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7856,10 +7866,10 @@ var _memcpy = Module["_memcpy"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["_memcpy"].apply(null, arguments) };
-var __GLOBAL__sub_I_Wire_cpp = Module["__GLOBAL__sub_I_Wire_cpp"] = function() {
+var ___errno_location = Module["___errno_location"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["__GLOBAL__sub_I_Wire_cpp"].apply(null, arguments) };
+  return Module["asm"]["___errno_location"].apply(null, arguments) };
 var stackAlloc = Module["stackAlloc"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7876,14 +7886,18 @@ var setTempRet0 = Module["setTempRet0"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["setTempRet0"].apply(null, arguments) };
+var __GLOBAL__sub_I_Wire_cpp = Module["__GLOBAL__sub_I_Wire_cpp"] = function() {
+  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
+  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
+  return Module["asm"]["__GLOBAL__sub_I_Wire_cpp"].apply(null, arguments) };
 var __GLOBAL__sub_I_Core_cpp = Module["__GLOBAL__sub_I_Core_cpp"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["__GLOBAL__sub_I_Core_cpp"].apply(null, arguments) };
-var _emscripten_get_global_libc = Module["_emscripten_get_global_libc"] = function() {
+var stackRestore = Module["stackRestore"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["_emscripten_get_global_libc"].apply(null, arguments) };
+  return Module["asm"]["stackRestore"].apply(null, arguments) };
 var ___getTypeName = Module["___getTypeName"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7892,10 +7906,6 @@ var stackSave = Module["stackSave"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["stackSave"].apply(null, arguments) };
-var __Z3loli = Module["__Z3loli"] = function() {
-  assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
-  assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["__Z3loli"].apply(null, arguments) };
 var ___cxa_can_catch = Module["___cxa_can_catch"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
@@ -7916,10 +7926,10 @@ var __GLOBAL__sub_I_SPI_cpp = Module["__GLOBAL__sub_I_SPI_cpp"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
   return Module["asm"]["__GLOBAL__sub_I_SPI_cpp"].apply(null, arguments) };
-var stackRestore = Module["stackRestore"] = function() {
+var _emscripten_get_global_libc = Module["_emscripten_get_global_libc"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
-  return Module["asm"]["stackRestore"].apply(null, arguments) };
+  return Module["asm"]["_emscripten_get_global_libc"].apply(null, arguments) };
 var _malloc = Module["_malloc"] = function() {
   assert(runtimeInitialized, 'you need to wait for the runtime to be ready (e.g. wait for main() to be called)');
   assert(!runtimeExited, 'the runtime was exited (use NO_EXIT_RUNTIME to keep it alive after main() exits)');
