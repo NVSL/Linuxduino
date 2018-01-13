@@ -36,10 +36,10 @@ Linuxduino.onRuntimeInitialized = function() {
     Linuxduino.pinMode(ledPin, Linuxduino.OUTPUT);
     while (1) {
     	console.log("LED ON");
-    	Linuxduino.digitalWrite(ledPin, Linuxduino.HIGH); // Turn on LED
+    	Linuxduino.digitalWrite(ledPin, 1); // Turn on LED
     	Linuxduino.delay(1000); // Delay 1 sec
     	console.log("LED OFF");
-    	Linuxduino.digitalWrite(ledPin, Linuxduino.LOW); // Turn off LED
+    	Linuxduino.digitalWrite(ledPin, 0); // Turn off LED
     	Linuxduino.delay(1000); // Delay 1 sec
     }
 }
