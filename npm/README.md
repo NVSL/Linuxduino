@@ -168,7 +168,7 @@ Linuxduino.onRuntimeInitialized = function() {
     Wire = new Linuxduino.Wire();
     Wire.begin();
     
-    // Send Hello World to device
+    // Send Hello World! to device
     Wire.beginTransmission(8); // 7-bit device address
     Wire.write("Hello");
     Wire.write(" ");
@@ -192,7 +192,7 @@ Linuxduino.onRuntimeInitialized = function() {
     Wire = new Linuxduino.Wire();
     Wire.begin("/dev/i2c-1");
     
-    // Send Hello World to device
+    // Send Hello World! to device
     Wire.beginTransmission(8); // 7-bit device address
     Wire.write("Hello");
     Wire.write(" ");
