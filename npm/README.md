@@ -222,7 +222,7 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 | Function |  C++  | Javascript / wasm |
 | ------ | ----------- | ----------- |
 | analogReference(type) | :x: -- No hardware support | :x:  |
-| analogRead(pin) | :x: -- No hardware support | :x: |
+| analogRead(pin) | :x: --No hardware support | :x: |
 | analogWrite(pin, value) - PWM | :heavy_check_mark: | :x: --Waiting for pthreads |
 | (EXTRA) setPwmDutyCycle (pin, dutycycle)  | :heavy_check_mark: | :x: --Waiting for pthreads |
 | (EXTRA) setPwmFrequency (pin, frequency, dutycycle)  | :heavy_check_mark: | :x: --Waiting for pthreads |
@@ -283,19 +283,19 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 | ------ | ----------- | ----------- |
 | Wire.begin() | :heavy_check_mark: | :heavy_check_mark: |
 | (EXTRA) Wire.begin(driverName) | :heavy_check_mark: | :heavy_check_mark: |
-| Wire.begin(address) | :x: - Linux I2C Slave driver was added recently, still verifying | :x: |
+| Wire.begin(address) | :x: --Linux I2C Slave driver was added recently, still verifying | :x: |
 | Wire.requestFrom(address, quantity) | :heavy_check_mark: | :heavy_check_mark: |
-| Wire.requestFrom(address, quantity, stop) | :x: - There is no way to send an I2C stop msg to the driver | :x: |
+| Wire.requestFrom(address, quantity, stop) | :x: --There is no way to send an I2C stop msg to the driver | :x: |
 | Wire.beginTransmission(address) | :heavy_check_mark: | :heavy_check_mark: |
 | Wire.endTransmission() | :heavy_check_mark: | :heavy_check_mark: |
-| Wire.endTransmission(stop)  | :x: - There is no way to send an I2C stop msg to the driver | :x: |
+| Wire.endTransmission(stop)  | :x: --There is no way to send an I2C stop msg to the driver | :x: |
 | Wire.write(value) | :heavy_check_mark: | :heavy_check_mark: |
 | Wire.write(string)  | :heavy_check_mark: | :heavy_check_mark: |
 | Wire.write(data, length) | :heavy_check_mark: | :heavy_check_mark: |
 | Wire.available() | :heavy_check_mark: | :heavy_check_mark: |
 | Wire.read()  | :heavy_check_mark: | :heavy_check_mark: |
-| Wire.onReceive(handler) | :x: -- Linux I2C Slave driver was added recently, still verifying | :x: |
-| Wire.onRequest(handler) | :x: -- Linux I2C Slave driver was added recently, still verifying | :x: |
+| Wire.onReceive(handler) | :x: --Linux I2C Slave driver was added recently, still verifying | :x: |
+| Wire.onRequest(handler) | :x: --Linux I2C Slave driver was added recently, still verifying | :x: |
 
 **SPI**
 
@@ -311,7 +311,7 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 | SPI.setClockDivider(divider) | :heavy_check_mark: | :heavy_check_mark:  |
 | SPI.setDataMode(mode) | :heavy_check_mark: | :heavy_check_mark:  |
 | receivedVal = SPI.transfer(val) | :heavy_check_mark: | :heavy_check_mark:  |
-| receivedVal16 = SPI.transfer16(val16) | :x: -- Not used | :x: |
+| receivedVal16 = SPI.transfer16(val16) | :x: --Not used | :x: |
 | SPI.transfer(buffer, size) | :heavy_check_mark: | :heavy_check_mark:  |
 | SPI.usingInterrupt(interruptNumber) | In Progress | In Progress |
 
