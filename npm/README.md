@@ -22,7 +22,7 @@ Linuxduino.onRuntimeInitialized = function() {
 }
 ```
 
-# GPIO
+# I/O
 
 Currenlty webassembly doesn't support pthreads which is required for inputs (e.g. ```pinMode(..., INPUT)```), but is under development. This is the main reason this library is still in Beta. For outputs (e.g. blinking an LED) here is an example for raspberry pi: 
 
@@ -208,7 +208,203 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 
 
 # List of Implemented Funtions
-TODO
+
+**Digital I/O**  
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| pinMode(pin, mode)  | :heavy_check_mark: | :heavy_check_mark: |
+| digitalWrite(pin, value) | :heavy_check_mark: | :heavy_check_mark: |
+| digitalRead(pin)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+
+**Analog I/O**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| analogReference(type) | :x: -- No hardware support | :x:  |
+| analogRead(pin) | :x: -- No hardware support | :x: |
+| analogWrite(pin, value) - PWM | :heavy_check_mark: | :x: --Waiting for pthreads |
+| (EXTRA) setPwmDutyCycle (pin, dutycycle)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| (EXTRA) setPwmFrequency (pin, frequency, dutycycle)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| (EXTRA) setPwmFrequency (pin, frequency)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| (EXTRA) setPwmPeriod (pin, microseconds)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+ 
+**Advanced I/O**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| tone(pin, frequency)   | :heavy_check_mark: | :x: --Waiting for pthreads |
+| tone(pin, frequency, duration) | :heavy_check_mark: | :x: --Waiting for pthreads |
+| noTone(pin)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| shiftOut(dataPin, clockPin, bitOrder, value)  | :heavy_check_mark: | :heavy_check_mark: |
+| byte incoming = shiftIn(dataPin, clockPin, bitOrder) | :heavy_check_mark: | :heavy_check_mark: |
+| pulseIn(pin, value)  | :heavy_check_mark: | :heavy_check_mark: |
+| pulseIn(pin, value, timeout) | :heavy_check_mark: | :heavy_check_mark: |
+
+**Serial**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| if (Serial)  | :heavy_check_mark: | :x: |
+| Serial.available() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.availableForWrite() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.begin(speed) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.begin(speed, config)| :heavy_check_mark: | :heavy_check_mark: |
+| (EXTRA) Serial.begin(driverName, speed) | :heavy_check_mark: | :heavy_check_mark: |
+| (EXTRA) Serial.begin(driverName, speed, config)| :heavy_check_mark: | :heavy_check_mark: |
+| Serial.end() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.find(target) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.findUntil(target, terminal) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.flush() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.parseFloat() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.parseInt() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.parseInt(char skipChar) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.peek() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.print(val)  | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.print(val, format)| :heavy_check_mark: | :heavy_check_mark: |
+| Serial.println(val)  | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.println(val, format) | :heavy_check_mark: | :heavy_check_mark: |
+| (EXTRA) Serial.printf(format, ...) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.read() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.readBytes(buffer, length)| :heavy_check_mark: | :heavy_check_mark: |
+| Serial.readBytesUntil(character, buffer, length) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.readString() | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.readStringUntil(terminator) | :heavy_check_mark: | :heavy_check_mark: |
+| (EXRTA) Serial.readStringCommand(character, buffer, length) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.setTimeout(time) | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.write(val)  | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.write(str)  | :heavy_check_mark: | :heavy_check_mark: |
+| Serial.write(buf, len) | :heavy_check_mark: | :heavy_check_mark: |
+| serialEvent() | In Progress | In Progress |
+
+**Wire (I2C)**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| Wire.begin() | :heavy_check_mark: | :heavy_check_mark: |
+| (EXTRA) Wire.begin(driverName) | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.begin(address) | :x: - Linux I2C Slave driver was added recently, still verifying | :x: |
+| Wire.requestFrom(address, quantity) | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.requestFrom(address, quantity, stop) | :x: - There is no way to send an I2C stop msg to the driver | :x: |
+| Wire.beginTransmission(address) | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.endTransmission() | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.endTransmission(stop)  | :x: - There is no way to send an I2C stop msg to the driver | :x: |
+| Wire.write(value) | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.write(string)  | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.write(data, length) | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.available() | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.read()  | :heavy_check_mark: | :heavy_check_mark: |
+| Wire.onReceive(handler) | :x: -- Linux I2C Slave driver was added recently, still verifying | :x: |
+| Wire.onRequest(handler) | :x: -- Linux I2C Slave driver was added recently, still verifying | :x: |
+
+**SPI**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| SPISettings | :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.begin() | :heavy_check_mark:  | :heavy_check_mark:  |
+| (EXTRA) SPI.begin(driverName) | :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.end()| :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.beginTransaction(mySettings) | :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.endTransaction() | :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.setBitOrder(order) | :heavy_check_mark:  | :heavy_check_mark:  |
+| SPI.setClockDivider(divider) | :heavy_check_mark: | :heavy_check_mark:  |
+| SPI.setDataMode(mode) | :heavy_check_mark: | :heavy_check_mark:  |
+| receivedVal = SPI.transfer(val) | :heavy_check_mark: | :heavy_check_mark:  |
+| receivedVal16 = SPI.transfer16(val16) | :x: | :x: |
+| SPI.transfer(buffer, size) | :heavy_check_mark: | :heavy_check_mark:  |
+| SPI.usingInterrupt(interruptNumber) | In Progress | In Progress |
+
+---------------------------------------------------
+
+**Time**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| time = millis()  | :heavy_check_mark: | :heavy_check_mark: |
+| time = micros()  | :heavy_check_mark: | :heavy_check_mark: |
+| delay(ms)  | :heavy_check_mark: | :heavy_check_mark: |
+| delayMicroseconds(us)  | :heavy_check_mark: | :heavy_check_mark: |
+
+**Math**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| min(x, y)  | :heavy_check_mark: | :heavy_check_mark: |
+| max(x, y) | :heavy_check_mark: | :heavy_check_mark: |
+| abs(x)  | :heavy_check_mark: | :heavy_check_mark: |
+| constrain(x, a, b) | :heavy_check_mark: | :heavy_check_mark: |
+| map(value, fromLow, fromHigh, toLow, toHigh)  | :heavy_check_mark: | :heavy_check_mark: |
+| pow(base, exponent)  | :heavy_check_mark: | :heavy_check_mark: |
+| radians(deg) | :heavy_check_mark: | :heavy_check_mark: |
+| degrees(rad) | :heavy_check_mark: | :heavy_check_mark: |
+| sqrt(x)  | :heavy_check_mark: | :heavy_check_mark: |
+| sq(x)  | :heavy_check_mark: | :heavy_check_mark: |
+
+**Trigonometry**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| sin(rad) | :heavy_check_mark: | :heavy_check_mark: |
+| cos(rad) | :heavy_check_mark: | :heavy_check_mark: |
+| tan(rad) | :heavy_check_mark: | :heavy_check_mark: |
+
+**Characters**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| isAlphaNumeric(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isAlpha(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isAscii(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isWhitespace(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isControl(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isDigit(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isGraph(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isLowerCase(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isPrintable(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isPunct(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isSpace(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isUpperCase(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+| isHexadecimalDigit(thisChar) | :heavy_check_mark: | :heavy_check_mark: |
+
+**Random Numbers**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| randomSeed(seed)  | :heavy_check_mark: | :heavy_check_mark: |
+| random(max)  | :heavy_check_mark: | :heavy_check_mark: |
+| random(min, max)  | :heavy_check_mark: | :heavy_check_mark: |
+
+**Bits and Bytes**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| lowByte(x) | :heavy_check_mark: | :heavy_check_mark: |
+| highByte(x) | :heavy_check_mark: | :heavy_check_mark: |
+| bitRead(x, n) | :heavy_check_mark: | :heavy_check_mark: |
+| bitWrite(x, n, b) | :heavy_check_mark: | :heavy_check_mark: |
+| bitSet(x, n) | :heavy_check_mark: | :heavy_check_mark: |
+| bitClear(x, n) | :heavy_check_mark: | :heavy_check_mark: |
+| bit(n) | :heavy_check_mark: | :heavy_check_mark: |
+
+**External Interrupts**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| attachInterrupt(digitalPinToInterrupt(pin), ISR, mode)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| detachInterrupt(interrupt)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| detachInterrupt(digitalPinToInterrupt(pin))  | :heavy_check_mark: | :x: --Waiting for pthreads |
+
+**Interrupts**
+
+| Function |  C++  | Javascript / wasm |
+| ------ | ----------- | ----------- |
+| interrupts()  | In Progress | In Progress |
+| noInterrupts() | In Progress | In Progress |
+
+----------------------------------------------------------
+
+Check the [Arduino Language Reference](https://www.arduino.cc/reference/en/) for more info about each function.
 
 # Support for Electron
 TODO
