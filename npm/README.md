@@ -311,7 +311,7 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 | SPI.setClockDivider(divider) | :heavy_check_mark: | :heavy_check_mark:  |
 | SPI.setDataMode(mode) | :heavy_check_mark: | :heavy_check_mark:  |
 | receivedVal = SPI.transfer(val) | :heavy_check_mark: | :heavy_check_mark:  |
-| receivedVal16 = SPI.transfer16(val16) | :x: | :x: |
+| receivedVal16 = SPI.transfer16(val16) | :x: -- Not used | :x: |
 | SPI.transfer(buffer, size) | :heavy_check_mark: | :heavy_check_mark:  |
 | SPI.usingInterrupt(interruptNumber) | In Progress | In Progress |
 
