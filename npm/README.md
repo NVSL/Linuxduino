@@ -215,7 +215,7 @@ Note, if you want to send exactly one byte in I2C for example 0xFF you need to u
 | ------ | ----------- | ----------- |
 | pinMode(pin, mode)  | :heavy_check_mark: | :heavy_check_mark: |
 | digitalWrite(pin, value) | :heavy_check_mark: | :heavy_check_mark: |
-| digitalRead(pin)  | :heavy_check_mark: | :x: --Waiting for pthreads |
+| digitalRead(pin)  | :heavy_check_mark: | :heavy_check_mark:  |
 
 **Analog I/O**
 
