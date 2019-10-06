@@ -2,14 +2,12 @@ mergeInto(LibraryManager.library, {
 	node_ioctl: function(fd, cmd, val) {
 		try{
 			var ioctl = require('ioctl');
-			var ref = require('ref');
-			var ArrayType = require('ref-array');
-			var StructType = require('ref-struct');
+			var ref = require('ref2');
 		} catch (e) {
 			console.log("library_ioctls.js: Error, an npm module "+ 
 				"needs to be installed.\n" +
 				"To install all the required npm modules run:\n"+
-				"npm install ioctl ref ref-array ref-struct\n");
+				"npm install ioctl ref2\n");
 			throw e;
 		}
 		var ret = -1;
@@ -29,13 +27,13 @@ mergeInto(LibraryManager.library, {
 				// 	speed_t __c_ispeed;
 				// 	speed_t __c_ospeed;
 				// };
-				var termios = new (StructType({
+				var termios = new (ref.StructType({
 				    c_iflag : ref.types.uint,
 				    c_oflag : ref.types.uint,
 				    c_cflag : ref.types.uint,
 				    c_lflag : ref.types.uint,
 				    c_line : ref.types.uchar,
-				    c_cc : ArrayType(ref.types.char, 32),
+				    c_cc : ref.ArrayType(ref.types.char, 32),
 				    c_ispeed: ref.types.int,
 				    c_ospeed: ref.types.int
 				}));
@@ -70,13 +68,13 @@ mergeInto(LibraryManager.library, {
 				// 	speed_t __c_ispeed;
 				// 	speed_t __c_ospeed;
 				// };
-				var termios = new (StructType({
+				var termios = new (ref.StructType({
 				    c_iflag : ref.types.uint,
 				    c_oflag : ref.types.uint,
 				    c_cflag : ref.types.uint,
 				    c_lflag : ref.types.uint,
 				    c_line : ref.types.uchar,
-				    c_cc : ArrayType(ref.types.char, 32),
+				    c_cc : ref.ArrayType(ref.types.char, 32),
 				    c_ispeed: ref.types.int,
 				    c_ospeed: ref.types.int
 				}));
@@ -100,7 +98,7 @@ mergeInto(LibraryManager.library, {
 
 			case 21531: 			// FIONREAD
 				//* int nBytes;
-				var nBytes = new Buffer(4);  
+				var nBytes = new Buffer.alloc(4);  
 				nBytes.type = ref.types.int;
 				// Call ioctl
 				try{
@@ -190,7 +188,7 @@ mergeInto(LibraryManager.library, {
 				// 	unsigned char		rx_nbits;		//__u8
 				// 	unsigned short		pad;			//__u8
 				// };
-				var spi_ioc_transfer = new (StructType({
+				var spi_ioc_transfer = new (ref.StructType({
 					// pointer to tx_buf and rx_buf was added cuz npm-ioctl 
 					// doesn't support &tx_buf and &rx_buf dereferencing.  
 					// Padding was also added to complete 8 bytes. 
@@ -212,8 +210,8 @@ mergeInto(LibraryManager.library, {
 				var ptr_tx = getValue(ptr, '*');
 				var ptr_rx = getValue(ptr+8, '*');
 				var numBytes = getValue(ptr+16, 'i32');
-				var tx = new Buffer(numBytes);
-				var rx = new Buffer(numBytes);
+				var tx = new Buffer.alloc(numBytes);
+				var rx = new Buffer.alloc(numBytes);
 				tx.type = ref.types.uchar;
 				rx.type = ref.types.uchar;
 				for (var i=0; i < numBytes; i++) {

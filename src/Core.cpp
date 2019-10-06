@@ -142,9 +142,9 @@ void pinMode(uint8_t pin, uint8_t mode)
             // Export pin for interrupt
             asprintf(&dir_path, "/sys/class/gpio/gpio%d/direction", pin);
             if (access(dir_path, F_OK) == -1) {
-                fp = fopen("/sys/class/gpio/export","r+");
+                fp = fopen("/sys/class/gpio/export","w");
                 if (fp == NULL) {
-                    fprintf(stderr, "%s(): export gpio error: %s\n",__func__, strerror (errno));
+                    fprintf(stderr, "%s(): export gpio error msg: %s\n",__func__, strerror (errno));
                     exit(1);
                 } else {
                     fprintf(fp,"%d",pin); 

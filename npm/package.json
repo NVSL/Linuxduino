@@ -1,27 +1,26 @@
 {
+    "author": "Jorge Garza <jgarzagu@ucsd.edu>",
     "name": "linuxduino",
     "description": "A javscript library for communicating with hardware in a Arduino style programming for any Linux platform",
-    "version": "0.1.0",
-    "author": "Jorge Garza",
-    "homepage": "http://github.com/NVSL/Linuxduino",
-    "bugs": "https://github.com/NVSL/Linuxduino/issues",
+    "version": "0.1.9",
     "keywords": [ "arduino", "linux", "spi", "i2c", "serial", "uart", "gpio", "pwm", "raspberry", "pi"],
     "repository": {
         "type": "git",
-        "url": "http://github.com/NVSL/Linuxduino/npm.git"
+        "url": "https://github.com/NVSL/Linuxduino/tree/master/npm"
     },
+    "bugs": "https://github.com/NVSL/Linuxduino/issues",
     "license": "MIT",
     "engines": {
         "node": ">=8.0.0"
     },
     "dependencies": {
         "ioctl": "^2.0.1",
-        "ref": "^1.3.5",
-        "ref-array": "^1.2.0",
-        "ref-struct": "^1.1.0"
+        "ref2": "^1.0.0"
     },
     "main": "lib/linuxduino.js",
     "files": [
-        "lib"
+        "lib/linuxduino.js",
+        "lib/linuxduino.wasm",
+        "tests/tests.js"
     ]
 }

@@ -248,7 +248,7 @@ mergeInto(LibraryManager.library, {
       read: function (stream, buffer, offset, length, position) {
         if (length === 0) return 0; // node errors on 0 length reads
         // FIXME this is terrible.
-        var nbuffer = new Buffer(length);
+        var nbuffer = new Buffer.alloc(length);
         var res;
         try {
           res = fs.readSync(stream.nfd, nbuffer, 0, length, position);
@@ -271,7 +271,7 @@ mergeInto(LibraryManager.library, {
       },
       write: function (stream, buffer, offset, length, position) {
         // FIXME this is terrible.
-        var nbuffer = new Buffer(buffer.subarray(offset, offset + length));
+        var nbuffer = new Buffer.from(buffer.subarray(offset, offset + length));
         var res;
         try {
           res = fs.writeSync(stream.nfd, nbuffer, 0, length, position);

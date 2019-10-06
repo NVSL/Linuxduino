@@ -3,21 +3,16 @@
 // Testing Serial find
 int main(void) {
 
- #ifdef __EMSCRIPTEN__
-    // Open Serial
-    Serial.begin("/devices/ttyUSB0", 115200, SERIAL_8N1);
-#else 
     // Open Serial
     Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
-#endif
 
-    printf("Write something (Writing 'OK' will trigger a found, 5 sec wait)...\n");
-    Serial.setTimeout(5000);
+    printf("Waiting to recieve OK ('OK' will trigger a found message)...\n");
+    Serial.setTimeout(5000); // Wait 5 seconds
     while (1) {
         bool isOKFound = false;
 
         // If target OK found return true, if timeout return false
-        isOKFound = Serial.find("OK");    //Wait for 'OK' for 10 seconds
+        isOKFound = Serial.find("OK");    //Wait for 'OK' for 5 sec
         if (isOKFound) {
             printf("OK found\n");
         } else {
