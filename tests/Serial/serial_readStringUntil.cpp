@@ -6,10 +6,10 @@ int main(void) {
     String data = "";
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
 
-    printf("Write Something (reads until letter x or timeout of 5 sec)......\n");
-    //sleep(5);
+    printf("Write Something (reads until letter x or timeout of 5 sec)...\n");
+
     Serial.setTimeout(5000);  // Set timeout of 5 seconds
 
     data = Serial.readStringUntil('x');

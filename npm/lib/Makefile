@@ -1,7 +1,7 @@
 CC=g++
 EMCC=emcc
 IDIR =../../src
-INCLUDE=-I$(IDIR) -I$(IDIR)/Linuxduinoh
+INCLUDE=-I$(IDIR)
 CFLAGS=$(INCLUDE) -Wall
 EMFLAGS=$(INCLUDE) --bind
 LDFLAGS=-pthread
@@ -11,12 +11,11 @@ JSLIBRARY=$(IDIR)/library_ioctls.js
 TARGETS=
 WASM_TARGETS= linuxduino.js
 
-all: $(TARGETS)
-all.js: $(WASM_TARGETS)
+all: $(WASM_TARGETS)
 
 # linuxduino
 linuxduino.js:
-	$(EMCC) $(EMFLAGS) $(DIRSOURCES) $(addsuffix .cpp, $(basename $@)) -s WASM=1 $< -o $@ --js-library $(JSLIBRARY)
+	$(EMCC) $(EMFLAGS) $(DIRSOURCES) $(addsuffix .cpp, $(basename $@)) -s WASM=1 -s ENVIRONMENT=node $< -o $@ --js-library $(JSLIBRARY)
 	./addCode.sh
 
 .PHONY: clean

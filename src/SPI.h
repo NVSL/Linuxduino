@@ -106,7 +106,9 @@ class SPILinux {
  		uint8_t transfer(uint8_t data);
  		//uint16_t transfer16(uint16_t data);
  		void transfer(void *buf, size_t count);
- 		void transfer_js(std::string buf, size_t count);
+ 		std::string transfer_js(std::string buf, size_t count);
+ 		//std::string transfer_js(uint8_t data);
+ 		//std::string transfer_js(std::string data);
 };
 
 

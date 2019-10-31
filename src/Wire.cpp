@@ -86,7 +86,7 @@ uint16_t WireLinux::txBufferLength = 0;
 uint16_t WireLinux::transmitting = 0;
 
 
-int WireLinux::i2c_write_bytes(int file, uint8_t *txBuff, size_t numBytes)
+int WireLinux::i2c_write_bytes(int file, uint8_t *txBuff, int numBytes)
 {
     int bytes_written = 0;
 
@@ -94,21 +94,20 @@ int WireLinux::i2c_write_bytes(int file, uint8_t *txBuff, size_t numBytes)
         return bytes_written;
     } else {
         bytes_written = unistd::write(file, txBuff, numBytes);
-        if ( bytes_written < 0) {
-            // errno == 5 (Input/Output error) means I2C cables
-            // may not be connected properly.
-            // Make noise about everything else except errno == 5. 
-            if (errno != 5 ) {
-                fprintf(stderr, "Wire.%s(): i2c write error: %s \n",
-                    __func__, strerror (errno));
-            }
-        }
+        if ( bytes_written < 0) bytes_written = 0;
+        // Leave I2C errors to the user, address or wrong wire connection produces an error
+        // if ( bytes_written < 0) { 
+        //     // Wrong I2C address or I2C wires may not be connected properly.
+        //     fprintf(stderr, "Wire.%s(): i2c write error, check wires! %s \n",
+        //         __func__, (errno != 0)? strerror (errno) : "");
+        //     exit(1);
+        // }
     }
 
     return bytes_written;
 }
 
-int WireLinux::i2c_read_bytes(int file, uint8_t *rxBuff, size_t numBytes)
+int WireLinux::i2c_read_bytes(int file, uint8_t *rxBuff, int numBytes)
 {
     int bytes_read = 0;
 
@@ -116,15 +115,14 @@ int WireLinux::i2c_read_bytes(int file, uint8_t *rxBuff, size_t numBytes)
         return bytes_read;
     } else {
         bytes_read = unistd::read(file, rxBuff, numBytes);
-        if ( bytes_read < 0) {
-            // errno == 5 (Input/Output error) means I2C cables 
-            // may not be connected properly.
-            // Make noise about everything else except errno == 5. 
-            if (errno != 5 ) {
-                fprintf(stderr, "Wire.%s(): i2c read error: %s \n",
-                    __func__, strerror (errno));
-            }
-        }
+        if ( bytes_read < 0) bytes_read = 0;
+        // Leave I2C errors to the user, address or wrong wire connection produces an error
+        // if ( bytes_read < 0) {
+        //     // Wrong I2C address or I2C wires may not be connected properly.
+        //     fprintf(stderr, "Wire.%s(): i2c read error, check wires! %s \n",
+        //         __func__, strerror (errno));
+        //     exit(1);
+        // }
     }
 
     return bytes_read;
@@ -212,7 +210,7 @@ void WireLinux::begin(uint8_t address)
 }
 */
 
-uint8_t WireLinux::requestFrom(uint8_t address, size_t quantity)
+int WireLinux::requestFrom(uint8_t address, int quantity)
 {
 
     if (fd < 0) {
@@ -243,7 +241,8 @@ uint8_t WireLinux::requestFrom(uint8_t address, size_t quantity)
     }
 
     // perform blocking read into buffer
-    uint8_t read = i2c_read_bytes(fd, rxBuffer, quantity);
+    int read = i2c_read_bytes(fd, rxBuffer, quantity);
+
     // set rx buffer iterator vars
     rxBufferIndex = 0;
     rxBufferLength = read;
@@ -286,7 +285,7 @@ void WireLinux::beginTransmission(uint8_t address)
 }
 
 // Writes data to the I2C, returns bytes written.
-size_t WireLinux::write(uint8_t data)
+int WireLinux::write(uint8_t data)
 {
 
     if (transmitting) {
@@ -304,24 +303,24 @@ size_t WireLinux::write(uint8_t data)
     } else {
         // in slave send mode
         // reply to master
-        i2c_write_bytes(fd, &data, 1);
+        return i2c_write_bytes(fd, &data, 1);
     }
 
     return 1;
 
 }
 
-size_t WireLinux::write(std::string str)
+int WireLinux::write(std::string str)
 {
     return write(str.c_str());
 }
 
 // Writes data to the I2C in form of string, returns bytes written. 
-size_t WireLinux::write(const char *str)
+int WireLinux::write(const char *str)
 {
-    size_t byteswritten = 0;
+    int byteswritten = 0;
 
-    for (size_t i = 0; i < strlen(str) ; i++) {
+    for (int i = 0; i < (int)strlen(str) ; i++) {
         // If transmitting data >= BUFFER_LENGTH, then break.
         if (write(str[i]) == 0) {
             break;
@@ -334,14 +333,14 @@ size_t WireLinux::write(const char *str)
 
 
 // Writes data to the I2C, returns bytes written. 
-size_t WireLinux::write(void *data, size_t quantity)
+int WireLinux::write(void *data, int quantity)
 {
 
-    size_t byteswritten = 0;
+    int byteswritten = 0;
 
     if (transmitting) {
         // in master transmitter mode
-        for(size_t i = 0; i < quantity; ++i){
+        for(int i = 0; i < quantity; ++i){
             write(((uint8_t *)data)[i]);
         }
         byteswritten = quantity;
@@ -355,7 +354,7 @@ size_t WireLinux::write(void *data, size_t quantity)
 }
 
 
-size_t WireLinux::write_js(std::string data, size_t quantity)
+int WireLinux::write_js(std::string data, int quantity)
 {
     return write((uint8_t *)data.c_str(), quantity);
 }
@@ -381,9 +380,9 @@ int WireLinux::read(void)
 }
 
 
-uint8_t WireLinux::endTransmission()
+int WireLinux::endTransmission()
 {
-    uint8_t ret;
+    int ret;
 
     if (fd < 0) {
         fprintf(stderr, "Wire.%s(): initialize I2C first with Wire.begin() \n", 
@@ -425,8 +424,8 @@ WireLinux Wire = WireLinux();
             .function("beginTransmission", &WireLinux::beginTransmission)
             .function("endTransmission", &WireLinux::endTransmission)
             // Wire.write(uint8_t) :: NO TYPE OVERLOAD WITH EMBIND (Added as write_byte)
-            .function("write_byte", select_overload<size_t(uint8_t)>(&WireLinux::write))
-            .function("write", select_overload<size_t(std::string)>(&WireLinux::write))
+            .function("write_byte", select_overload<int(uint8_t)>(&WireLinux::write))
+            .function("write", select_overload<int(std::string)>(&WireLinux::write))
             .function("write", &WireLinux::write_js)
             .function("available", &WireLinux::available)
             .function("read", &WireLinux::read)

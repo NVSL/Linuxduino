@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0,
+   initial-scale=1.0, user-scalable=no">
+  <title>MAIN APP</title>
+</head>
+<body>
+    <div>Hello World</div>
+    <script>
+      const linuxduino = require('linuxduino');
+
+      (async() => {
+        // Wait for wasm file
+        await linuxduino.ready;
+
+        console.log("WASM loaded");
+
+        Serial = new linuxduino.Serial();
+        Serial.begin("/dev/ttyUSB0", 115200);
+        Serial.print("A const char message ");
+        Serial.end();
+      })();
+    </script>
+</body>

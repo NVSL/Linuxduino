@@ -1,19 +1,19 @@
 #include "Linuxduino.h"
-#include "unistd.h" // for sleep();
 
 // Testing Serial flush
 int main(void) {
 
+    // Memory allocation
     char buff[10];
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
 
     // Clean buffer
     memset(buff, 0, sizeof(buff));
 
-    printf("Write Something...\n");
-    sleep(5);
+    printf("Write something on the other terminal (5 sec wait)...\n");
+    delay(5000);
 
     //  Read 2 bytes
     Serial.readBytes(buff, 2);
@@ -26,7 +26,7 @@ int main(void) {
     // Clear Serial buffer
     Serial.flush();
 
-    //  Read 2 bytes (Should print nothing)
+    //  Read 2 bytes (Should print nothing - flush)
     Serial.readBytes(buff, 2);
     buff[2] = 0;
     printf("Recieved 2 = %s\n", buff);

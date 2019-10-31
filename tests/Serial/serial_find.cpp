@@ -4,7 +4,7 @@
 int main(void) {
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
 
     printf("Waiting to recieve OK ('OK' will trigger a found message)...\n");
     Serial.setTimeout(5000); // Wait 5 seconds

@@ -4,13 +4,12 @@
 int main(void) {
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
-
-    while (!Serial) { // Just test if(Serial)
-        printf("Waiting for Serial ...\n");
-    }
+    Serial.begin("/dev/ttyUSB0", 115200);
 
     printf("Write something...\n");
+
+    // Read string and wait for "enter"
+    // Works as a termial (Ctrl^C to terminate)
     while(1) {
         char data[50];
         memset(data, 0, sizeof(data));

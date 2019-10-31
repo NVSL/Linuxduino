@@ -1,5 +1,4 @@
 #include "Linuxduino.h"
-#include "unistd.h" // For sleep()
 
 // Testing Serial readBytes
 int main(void) {
@@ -7,10 +6,10 @@ int main(void) {
     char buff[10];
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
     
     printf("Write Something (Recieves max 5 bytes)...\n");
-    sleep(5);
+    delay(5000);
 
     // Clean buffer
     for (int i = 0; i<10; i++) {

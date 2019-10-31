@@ -109,6 +109,7 @@ public:
 	void flush();
 	long parseInt() { return parseInt(NO_IGNORE_CHAR); };
 	long parseInt(char ignore);
+	long parseInt_js(std::string ignore);
 	float parseFloat();
 	int peek();
 	size_t print(const String &s);
@@ -129,15 +130,16 @@ public:
 	size_t printf(const char *fmt, ... );
 	int read();
 	size_t readBytes(char buffer[], size_t length);
-	size_t readBytes_js(std::string buffer, size_t length);
+	std::string readBytes_js(std::string buffer, size_t length);
 	size_t readBytesUntil(char terminator, char buffer[], size_t length);
-	size_t readBytesUntil_js(char terminator, std::string buffer, size_t length);
+	std::string readBytesUntil_js(std::string terminator, std::string buffer, size_t length);
 	String readString();
 	std::string readString_std();
 	String readStringUntil(char terminator);
 	std::string readStringUntil_std(char terminator);
+	std::string readStringUntil_js(std::string terminator);
 	size_t readStringCommand(char terminator, char buffer[], size_t length);
-	size_t readStringCommand_js(char terminator, std::string buffer, size_t length);
+	std::string readStringCommand_js(std::string terminator, std::string buffer, size_t length);
 	void setTimeout(long millis);
 	size_t write(uint8_t c);
 	size_t write(std::string str);

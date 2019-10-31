@@ -374,22 +374,44 @@ uint8_t SPILinux::transfer(uint8_t data)
     return transferData;
 }
 
-/*
-uint16_t SPILinux::transfer16(uint16_t data)
-{
-    // TODO
-}
-*/
 
 void SPILinux::transfer(void *buf, size_t count)
 {
     spi_transfer_bytes(fd, (uint8_t *)buf, count);
 }
 
-void SPILinux::transfer_js(std::string buf, size_t count)
+// std::string SPILinux::transfer_js(uint8_t data)
+// {
+//     std::string ret(1, transfer(data));
+//     return ret;
+// }
+
+
+// std::string SPILinux::transfer_js(std::string data)
+// {
+//     return transfer_js(data, data.length());
+// }
+
+
+std::string SPILinux::transfer_js(std::string buf, size_t count)
 {
-    transfer((uint8_t *)buf.c_str(), count);
+    if (count == 1) {
+        buf[0] = transfer((uint8_t)buf.c_str()[0]);
+    } else if (count > 1) {
+        transfer((uint8_t *)buf.c_str(), count);
+    }
+    
+    return buf;
 }
+
+
+
+/*
+uint16_t SPILinux::transfer16(uint16_t data)
+{
+    // TODO
+}
+*/
 
 
 SPILinux SPI = SPILinux();

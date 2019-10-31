@@ -48,12 +48,8 @@ Module['postRun'] = [];
 
 var ENVIRONMENT_IS_WEB = false;
 var ENVIRONMENT_IS_WORKER = false;
-var ENVIRONMENT_IS_NODE = false;
+var ENVIRONMENT_IS_NODE = true;
 var ENVIRONMENT_IS_SHELL = false;
-ENVIRONMENT_IS_WEB = typeof window === 'object';
-ENVIRONMENT_IS_WORKER = typeof importScripts === 'function';
-ENVIRONMENT_IS_NODE = typeof process === 'object' && typeof require === 'function' && !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_WORKER;
-ENVIRONMENT_IS_SHELL = !ENVIRONMENT_IS_WEB && !ENVIRONMENT_IS_NODE && !ENVIRONMENT_IS_WORKER;
 
 if (Module['ENVIRONMENT']) {
   throw new Error('Module.ENVIRONMENT has been deprecated. To force the environment, use the ENVIRONMENT compile-time option (for example, -s ENVIRONMENT=web or -s ENVIRONMENT=node)');
@@ -79,6 +75,7 @@ function locateFile(path) {
 }
 
 if (ENVIRONMENT_IS_NODE) {
+  if (!(typeof process === 'object' && typeof require === 'function')) throw new Error('not compiled for this environment (did you build to HTML and try to run it not on the web, or set ENVIRONMENT to something - like node - and run it someplace else - like on the web?)');
   scriptDirectory = __dirname + '/';
 
   // Expose functionality in the same simple way that the shells work
@@ -129,88 +126,6 @@ if (ENVIRONMENT_IS_NODE) {
   };
 
   Module['inspect'] = function () { return '[Emscripten Module object]'; };
-} else
-if (ENVIRONMENT_IS_SHELL) {
-
-
-  if (typeof read != 'undefined') {
-    Module['read'] = function shell_read(f) {
-      return read(f);
-    };
-  }
-
-  Module['readBinary'] = function readBinary(f) {
-    var data;
-    if (typeof readbuffer === 'function') {
-      return new Uint8Array(readbuffer(f));
-    }
-    data = read(f, 'binary');
-    assert(typeof data === 'object');
-    return data;
-  };
-
-  if (typeof scriptArgs != 'undefined') {
-    Module['arguments'] = scriptArgs;
-  } else if (typeof arguments != 'undefined') {
-    Module['arguments'] = arguments;
-  }
-
-  if (typeof quit === 'function') {
-    Module['quit'] = function(status) {
-      quit(status);
-    }
-  }
-} else
-if (ENVIRONMENT_IS_WEB || ENVIRONMENT_IS_WORKER) {
-  if (ENVIRONMENT_IS_WORKER) { // Check worker, not web, since window could be polyfilled
-    scriptDirectory = self.location.href;
-  } else if (document.currentScript) { // web
-    scriptDirectory = document.currentScript.src;
-  }
-  // blob urls look like blob:http://site.com/etc/etc and we cannot infer anything from them.
-  // otherwise, slice off the final part of the url to find the script directory.
-  // if scriptDirectory does not contain a slash, lastIndexOf will return -1,
-  // and scriptDirectory will correctly be replaced with an empty string.
-  if (scriptDirectory.indexOf('blob:') !== 0) {
-    scriptDirectory = scriptDirectory.substr(0, scriptDirectory.lastIndexOf('/')+1);
-  } else {
-    scriptDirectory = '';
-  }
-
-
-  Module['read'] = function shell_read(url) {
-      var xhr = new XMLHttpRequest();
-      xhr.open('GET', url, false);
-      xhr.send(null);
-      return xhr.responseText;
-  };
-
-  if (ENVIRONMENT_IS_WORKER) {
-    Module['readBinary'] = function readBinary(url) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', url, false);
-        xhr.responseType = 'arraybuffer';
-        xhr.send(null);
-        return new Uint8Array(xhr.response);
-    };
-  }
-
-  Module['readAsync'] = function readAsync(url, onload, onerror) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', url, true);
-    xhr.responseType = 'arraybuffer';
-    xhr.onload = function xhr_onload() {
-      if (xhr.status == 200 || (xhr.status == 0 && xhr.response)) { // file URLs can return 0
-        onload(xhr.response);
-        return;
-      }
-      onerror();
-    };
-    xhr.onerror = onerror;
-    xhr.send(null);
-  };
-
-  Module['setWindowTitle'] = function(title) { document.title = title };
 } else
 {
   throw new Error('environment detection error');
@@ -1219,11 +1134,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 18192,
+    STACK_BASE = 18096,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5261072,
-    DYNAMIC_BASE = 5261072,
-    DYNAMICTOP_PTR = 18160;
+    STACK_MAX = 5260976,
+    DYNAMIC_BASE = 5260976,
+    DYNAMICTOP_PTR = 18064;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1674,8 +1589,8 @@ Module['asm'] = function(global, env, providedBuffer) {
   ;
   // import table
   env['table'] = wasmTable = new WebAssembly.Table({
-    'initial': 4197,
-    'maximum': 4197,
+    'initial': 4325,
+    'maximum': 4325,
     'element': 'anyfunc'
   });
   // With the wasm backend __memory_base and __table_base and only needed for
@@ -1700,7 +1615,7 @@ function _emscripten_asm_const_i(code) {
 
 
 
-// STATICTOP = STATIC_BASE + 17168;
+// STATICTOP = STATIC_BASE + 17072;
 /* global initializers */  __ATINIT__.push({ func: function() { globalCtors() } });
 
 
@@ -1711,7 +1626,7 @@ function _emscripten_asm_const_i(code) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 18176
+var tempDoublePtr = 18080
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
@@ -2428,286 +2343,6 @@ function copyTempDouble(ptr) {
           return 0;
         }}};
   
-  var IDBFS={dbs:{},indexedDB:function () {
-        if (typeof indexedDB !== 'undefined') return indexedDB;
-        var ret = null;
-        if (typeof window === 'object') ret = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-        assert(ret, 'IDBFS used, but indexedDB not supported');
-        return ret;
-      },DB_VERSION:21,DB_STORE_NAME:"FILE_DATA",mount:function (mount) {
-        // reuse all of the core MEMFS functionality
-        return MEMFS.mount.apply(null, arguments);
-      },syncfs:function (mount, populate, callback) {
-        IDBFS.getLocalSet(mount, function(err, local) {
-          if (err) return callback(err);
-  
-          IDBFS.getRemoteSet(mount, function(err, remote) {
-            if (err) return callback(err);
-  
-            var src = populate ? remote : local;
-            var dst = populate ? local : remote;
-  
-            IDBFS.reconcile(src, dst, callback);
-          });
-        });
-      },getDB:function (name, callback) {
-        // check the cache first
-        var db = IDBFS.dbs[name];
-        if (db) {
-          return callback(null, db);
-        }
-  
-        var req;
-        try {
-          req = IDBFS.indexedDB().open(name, IDBFS.DB_VERSION);
-        } catch (e) {
-          return callback(e);
-        }
-        if (!req) {
-          return callback("Unable to connect to IndexedDB");
-        }
-        req.onupgradeneeded = function(e) {
-          var db = e.target.result;
-          var transaction = e.target.transaction;
-  
-          var fileStore;
-  
-          if (db.objectStoreNames.contains(IDBFS.DB_STORE_NAME)) {
-            fileStore = transaction.objectStore(IDBFS.DB_STORE_NAME);
-          } else {
-            fileStore = db.createObjectStore(IDBFS.DB_STORE_NAME);
-          }
-  
-          if (!fileStore.indexNames.contains('timestamp')) {
-            fileStore.createIndex('timestamp', 'timestamp', { unique: false });
-          }
-        };
-        req.onsuccess = function() {
-          db = req.result;
-  
-          // add to the cache
-          IDBFS.dbs[name] = db;
-          callback(null, db);
-        };
-        req.onerror = function(e) {
-          callback(this.error);
-          e.preventDefault();
-        };
-      },getLocalSet:function (mount, callback) {
-        var entries = {};
-  
-        function isRealDir(p) {
-          return p !== '.' && p !== '..';
-        };
-        function toAbsolute(root) {
-          return function(p) {
-            return PATH.join2(root, p);
-          }
-        };
-  
-        var check = FS.readdir(mount.mountpoint).filter(isRealDir).map(toAbsolute(mount.mountpoint));
-  
-        while (check.length) {
-          var path = check.pop();
-          var stat;
-  
-          try {
-            stat = FS.stat(path);
-          } catch (e) {
-            return callback(e);
-          }
-  
-          if (FS.isDir(stat.mode)) {
-            check.push.apply(check, FS.readdir(path).filter(isRealDir).map(toAbsolute(path)));
-          }
-  
-          entries[path] = { timestamp: stat.mtime };
-        }
-  
-        return callback(null, { type: 'local', entries: entries });
-      },getRemoteSet:function (mount, callback) {
-        var entries = {};
-  
-        IDBFS.getDB(mount.mountpoint, function(err, db) {
-          if (err) return callback(err);
-  
-          try {
-            var transaction = db.transaction([IDBFS.DB_STORE_NAME], 'readonly');
-            transaction.onerror = function(e) {
-              callback(this.error);
-              e.preventDefault();
-            };
-  
-            var store = transaction.objectStore(IDBFS.DB_STORE_NAME);
-            var index = store.index('timestamp');
-  
-            index.openKeyCursor().onsuccess = function(event) {
-              var cursor = event.target.result;
-  
-              if (!cursor) {
-                return callback(null, { type: 'remote', db: db, entries: entries });
-              }
-  
-              entries[cursor.primaryKey] = { timestamp: cursor.key };
-  
-              cursor.continue();
-            };
-          } catch (e) {
-            return callback(e);
-          }
-        });
-      },loadLocalEntry:function (path, callback) {
-        var stat, node;
-  
-        try {
-          var lookup = FS.lookupPath(path);
-          node = lookup.node;
-          stat = FS.stat(path);
-        } catch (e) {
-          return callback(e);
-        }
-  
-        if (FS.isDir(stat.mode)) {
-          return callback(null, { timestamp: stat.mtime, mode: stat.mode });
-        } else if (FS.isFile(stat.mode)) {
-          // Performance consideration: storing a normal JavaScript array to a IndexedDB is much slower than storing a typed array.
-          // Therefore always convert the file contents to a typed array first before writing the data to IndexedDB.
-          node.contents = MEMFS.getFileDataAsTypedArray(node);
-          return callback(null, { timestamp: stat.mtime, mode: stat.mode, contents: node.contents });
-        } else {
-          return callback(new Error('node type not supported'));
-        }
-      },storeLocalEntry:function (path, entry, callback) {
-        try {
-          if (FS.isDir(entry.mode)) {
-            FS.mkdir(path, entry.mode);
-          } else if (FS.isFile(entry.mode)) {
-            FS.writeFile(path, entry.contents, { canOwn: true });
-          } else {
-            return callback(new Error('node type not supported'));
-          }
-  
-          FS.chmod(path, entry.mode);
-          FS.utime(path, entry.timestamp, entry.timestamp);
-        } catch (e) {
-          return callback(e);
-        }
-  
-        callback(null);
-      },removeLocalEntry:function (path, callback) {
-        try {
-          var lookup = FS.lookupPath(path);
-          var stat = FS.stat(path);
-  
-          if (FS.isDir(stat.mode)) {
-            FS.rmdir(path);
-          } else if (FS.isFile(stat.mode)) {
-            FS.unlink(path);
-          }
-        } catch (e) {
-          return callback(e);
-        }
-  
-        callback(null);
-      },loadRemoteEntry:function (store, path, callback) {
-        var req = store.get(path);
-        req.onsuccess = function(event) { callback(null, event.target.result); };
-        req.onerror = function(e) {
-          callback(this.error);
-          e.preventDefault();
-        };
-      },storeRemoteEntry:function (store, path, entry, callback) {
-        var req = store.put(entry, path);
-        req.onsuccess = function() { callback(null); };
-        req.onerror = function(e) {
-          callback(this.error);
-          e.preventDefault();
-        };
-      },removeRemoteEntry:function (store, path, callback) {
-        var req = store.delete(path);
-        req.onsuccess = function() { callback(null); };
-        req.onerror = function(e) {
-          callback(this.error);
-          e.preventDefault();
-        };
-      },reconcile:function (src, dst, callback) {
-        var total = 0;
-  
-        var create = [];
-        Object.keys(src.entries).forEach(function (key) {
-          var e = src.entries[key];
-          var e2 = dst.entries[key];
-          if (!e2 || e.timestamp > e2.timestamp) {
-            create.push(key);
-            total++;
-          }
-        });
-  
-        var remove = [];
-        Object.keys(dst.entries).forEach(function (key) {
-          var e = dst.entries[key];
-          var e2 = src.entries[key];
-          if (!e2) {
-            remove.push(key);
-            total++;
-          }
-        });
-  
-        if (!total) {
-          return callback(null);
-        }
-  
-        var errored = false;
-        var completed = 0;
-        var db = src.type === 'remote' ? src.db : dst.db;
-        var transaction = db.transaction([IDBFS.DB_STORE_NAME], 'readwrite');
-        var store = transaction.objectStore(IDBFS.DB_STORE_NAME);
-  
-        function done(err) {
-          if (err) {
-            if (!done.errored) {
-              done.errored = true;
-              return callback(err);
-            }
-            return;
-          }
-          if (++completed >= total) {
-            return callback(null);
-          }
-        };
-  
-        transaction.onerror = function(e) {
-          done(this.error);
-          e.preventDefault();
-        };
-  
-        // sort paths in ascending order so directory entries are created
-        // before the files inside them
-        create.sort().forEach(function (path) {
-          if (dst.type === 'local') {
-            IDBFS.loadRemoteEntry(store, path, function (err, entry) {
-              if (err) return done(err);
-              IDBFS.storeLocalEntry(path, entry, done);
-            });
-          } else {
-            IDBFS.loadLocalEntry(path, function (err, entry) {
-              if (err) return done(err);
-              IDBFS.storeRemoteEntry(store, path, entry, done);
-            });
-          }
-        });
-  
-        // sort paths in descending order so files are deleted before their
-        // parent directories
-        remove.sort().reverse().forEach(function(path) {
-          if (dst.type === 'local') {
-            IDBFS.removeLocalEntry(path, done);
-          } else {
-            IDBFS.removeRemoteEntry(store, path, done);
-          }
-        });
-      }};
-  
   var NODEFS={isWindows:false,staticInit:function () {
         NODEFS.isWindows = !!process.platform.match(/^win/);
       },mount:function (mount) {
@@ -2962,136 +2597,6 @@ function copyTempDouble(ptr) {
             throw new FS.ErrnoError(ERRNO_CODES.EINVAL);
           }
   
-          return position;
-        }}};
-  
-  var WORKERFS={DIR_MODE:16895,FILE_MODE:33279,reader:null,mount:function (mount) {
-        assert(ENVIRONMENT_IS_WORKER);
-        if (!WORKERFS.reader) WORKERFS.reader = new FileReaderSync();
-        var root = WORKERFS.createNode(null, '/', WORKERFS.DIR_MODE, 0);
-        var createdParents = {};
-        function ensureParent(path) {
-          // return the parent node, creating subdirs as necessary
-          var parts = path.split('/');
-          var parent = root;
-          for (var i = 0; i < parts.length-1; i++) {
-            var curr = parts.slice(0, i+1).join('/');
-            // Issue 4254: Using curr as a node name will prevent the node
-            // from being found in FS.nameTable when FS.open is called on
-            // a path which holds a child of this node,
-            // given that all FS functions assume node names
-            // are just their corresponding parts within their given path,
-            // rather than incremental aggregates which include their parent's
-            // directories.
-            if (!createdParents[curr]) {
-              createdParents[curr] = WORKERFS.createNode(parent, parts[i], WORKERFS.DIR_MODE, 0);
-            }
-            parent = createdParents[curr];
-          }
-          return parent;
-        }
-        function base(path) {
-          var parts = path.split('/');
-          return parts[parts.length-1];
-        }
-        // We also accept FileList here, by using Array.prototype
-        Array.prototype.forEach.call(mount.opts["files"] || [], function(file) {
-          WORKERFS.createNode(ensureParent(file.name), base(file.name), WORKERFS.FILE_MODE, 0, file, file.lastModifiedDate);
-        });
-        (mount.opts["blobs"] || []).forEach(function(obj) {
-          WORKERFS.createNode(ensureParent(obj["name"]), base(obj["name"]), WORKERFS.FILE_MODE, 0, obj["data"]);
-        });
-        (mount.opts["packages"] || []).forEach(function(pack) {
-          pack['metadata'].files.forEach(function(file) {
-            var name = file.filename.substr(1); // remove initial slash
-            WORKERFS.createNode(ensureParent(name), base(name), WORKERFS.FILE_MODE, 0, pack['blob'].slice(file.start, file.end));
-          });
-        });
-        return root;
-      },createNode:function (parent, name, mode, dev, contents, mtime) {
-        var node = FS.createNode(parent, name, mode);
-        node.mode = mode;
-        node.node_ops = WORKERFS.node_ops;
-        node.stream_ops = WORKERFS.stream_ops;
-        node.timestamp = (mtime || new Date).getTime();
-        assert(WORKERFS.FILE_MODE !== WORKERFS.DIR_MODE);
-        if (mode === WORKERFS.FILE_MODE) {
-          node.size = contents.size;
-          node.contents = contents;
-        } else {
-          node.size = 4096;
-          node.contents = {};
-        }
-        if (parent) {
-          parent.contents[name] = node;
-        }
-        return node;
-      },node_ops:{getattr:function (node) {
-          return {
-            dev: 1,
-            ino: undefined,
-            mode: node.mode,
-            nlink: 1,
-            uid: 0,
-            gid: 0,
-            rdev: undefined,
-            size: node.size,
-            atime: new Date(node.timestamp),
-            mtime: new Date(node.timestamp),
-            ctime: new Date(node.timestamp),
-            blksize: 4096,
-            blocks: Math.ceil(node.size / 4096),
-          };
-        },setattr:function (node, attr) {
-          if (attr.mode !== undefined) {
-            node.mode = attr.mode;
-          }
-          if (attr.timestamp !== undefined) {
-            node.timestamp = attr.timestamp;
-          }
-        },lookup:function (parent, name) {
-          throw new FS.ErrnoError(2);
-        },mknod:function (parent, name, mode, dev) {
-          throw new FS.ErrnoError(1);
-        },rename:function (oldNode, newDir, newName) {
-          throw new FS.ErrnoError(1);
-        },unlink:function (parent, name) {
-          throw new FS.ErrnoError(1);
-        },rmdir:function (parent, name) {
-          throw new FS.ErrnoError(1);
-        },readdir:function (node) {
-          var entries = ['.', '..'];
-          for (var key in node.contents) {
-            if (!node.contents.hasOwnProperty(key)) {
-              continue;
-            }
-            entries.push(key);
-          }
-          return entries;
-        },symlink:function (parent, newName, oldPath) {
-          throw new FS.ErrnoError(1);
-        },readlink:function (node) {
-          throw new FS.ErrnoError(1);
-        }},stream_ops:{read:function (stream, buffer, offset, length, position) {
-          if (position >= stream.node.size) return 0;
-          var chunk = stream.node.contents.slice(position, position + length);
-          var ab = WORKERFS.reader.readAsArrayBuffer(chunk);
-          buffer.set(new Uint8Array(ab), offset);
-          return chunk.size;
-        },write:function (stream, buffer, offset, length, position) {
-          throw new FS.ErrnoError(5);
-        },llseek:function (stream, offset, whence) {
-          var position = offset;
-          if (whence === 1) {  // SEEK_CUR.
-            position += stream.position;
-          } else if (whence === 2) {  // SEEK_END.
-            if (FS.isFile(stream.node.mode)) {
-              position += stream.node.size;
-            }
-          }
-          if (position < 0) {
-            throw new FS.ErrnoError(22);
-          }
           return position;
         }}};
   
@@ -4317,9 +3822,7 @@ function copyTempDouble(ptr) {
   
         FS.filesystems = {
           'MEMFS': MEMFS,
-          'IDBFS': IDBFS,
           'NODEFS': NODEFS,
-          'WORKERFS': WORKERFS,
         };
       },init:function (input, output, error) {
         assert(!FS.init.initialized, 'FS.init was previously called. If you want to initialize later with custom parameters, remove any earlier calls (note that one is automatically added to the generated code)');
@@ -6768,8 +6271,6 @@ function copyTempDouble(ptr) {
       // implementation is not :(
       return (0
         || ENVIRONMENT_IS_NODE
-        || (typeof dateNow !== 'undefined')
-        || (typeof performance === 'object' && performance && typeof performance['now'] === 'function')
         );
     }function _clock_gettime(clk_id, tp) {
       // int clock_gettime(clockid_t clk_id, struct timespec *tp);
@@ -6852,278 +6353,307 @@ function copyTempDouble(ptr) {
     }
 
   function _node_ioctl(fd, cmd, val) {
-  		try{
-  			var ioctl = require('ioctl');
-  			var ref = require('ref2');
-  		} catch (e) {
-  			console.log("library_ioctls.js: Error, an npm module "+ 
-  				"needs to be installed.\n" +
-  				"To install all the required npm modules run:\n"+
-  				"npm install ioctl ref2\n");
-  			throw e;
-  		}
-  		var ret = -1;
-  		// Get stream from the filesystem.
-  		var stream = FS.streams[fd];
+      try{
+        var ioctl = require('ioctl-napi');
+      } catch (e) {
+        console.log("library_ioctls.js: Missing npm module\n" +
+          "To install the missing npm module run:\n"+
+          "npm install ioctl-napi\n");
+        throw e;
+      }
+      var ret = -1;
+      // Get stream from the filesystem.
+      var stream = FS.streams[fd];
   
-  		switch (cmd) {
-  			case 21505: 	// TCGETS
-  				//struct termios
-  				// {
-  				// 	tcflag_t c_iflag;
-  				// 	tcflag_t c_oflag;
-  				// 	tcflag_t c_cflag;
-  				// 	tcflag_t c_lflag;
-  				// 	cc_t c_line;
-  				// 	cc_t c_cc[NCCS];
-  				// 	speed_t __c_ispeed;
-  				// 	speed_t __c_ospeed;
-  				// };
-  				var termios = new (ref.StructType({
-  				    c_iflag : ref.types.uint,
-  				    c_oflag : ref.types.uint,
-  				    c_cflag : ref.types.uint,
-  				    c_lflag : ref.types.uint,
-  				    c_line : ref.types.uchar,
-  				    c_cc : ref.ArrayType(ref.types.char, 32),
-  				    c_ispeed: ref.types.int,
-  				    c_ospeed: ref.types.int
-  				}));
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, termios.ref());
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				// Set data from ioctl
-  				var ptr = getValue(val, '*');
-  				setValue(ptr, termios.c_iflag, 'i32');
-  				setValue(ptr+4, termios.c_oflag,  'i32');
-  				setValue(ptr+8, termios.c_cflag,  'i32');
-  				setValue(ptr+12, termios.c_lflag, 'i32');
-  				setValue(ptr+14, termios.c_line, 'i8');
-  				for (var i =0; i< 32; i++){
-  					setValue(ptr+17+i, termios.c_cc[i], 'i8');
-  				}
+      switch (cmd) {
+        case 21505:   // TCGETS
   
-  				break;
+          //struct termios
+          // {
+          //  tcflag_t c_iflag;   // uint (4 bytes)
+          //  tcflag_t c_oflag;   // uint (4 bytes)
+          //  tcflag_t c_cflag;   // uint (4 bytes)
+          //  tcflag_t c_lflag;   // uint (4 bytes)
+          //  cc_t c_line;        // uchar (1 byte)
+          //  cc_t c_cc[NCCS];    // uchar (32 bytes)
+          //  speed_t __c_ispeed; // uint (4 bytes)
+          //  speed_t __c_ospeed; // uint (4 bytes)
+          // }; // Total: 57 bytes.
   
-  			case 21506: 			// TCSETS
-  				//struct termios
-  				// {
-  				// 	tcflag_t c_iflag;
-  				// 	tcflag_t c_oflag;
-  				// 	tcflag_t c_cflag;
-  				// 	tcflag_t c_lflag;
-  				// 	cc_t c_line;
-  				// 	cc_t c_cc[NCCS];
-  				// 	speed_t __c_ispeed;
-  				// 	speed_t __c_ospeed;
-  				// };
-  				var termios = new (ref.StructType({
-  				    c_iflag : ref.types.uint,
-  				    c_oflag : ref.types.uint,
-  				    c_cflag : ref.types.uint,
-  				    c_lflag : ref.types.uint,
-  				    c_line : ref.types.uchar,
-  				    c_cc : ref.ArrayType(ref.types.char, 32),
-  				    c_ispeed: ref.types.int,
-  				    c_ospeed: ref.types.int
-  				}));
-  				// Get data from pointer
-  				var ptr = getValue(val, '*');
-  				termios.c_iflag = getValue(ptr, 'i32');
-  				termios.c_oflag = getValue(ptr+4, 'i32');
-  				termios.c_cflag = getValue(ptr+8, 'i32');
-  				termios.c_lflag = getValue(ptr+12, 'i32');
-  				termios.c_line  = getValue(ptr+14, 'i8');
-  				for (var i =0; i< 32; i++){
-  					termios.c_cc[i] = getValue(ptr+17+i, 'i8');
-  				}
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, termios.ref());
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break;
+          var termios = Buffer.alloc(57);
   
-  			case 21531: 			// FIONREAD
-  				//* int nBytes;
-  				var nBytes = new Buffer.alloc(4);  
-  				nBytes.type = ref.types.int;
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, nBytes);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				// Return availale bytes in stream
-  				var ptr = getValue(val, '*');
-  				setValue(ptr, nBytes.deref(), 'i32');
-  				break;
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, termios);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
+          
+          var c_iflag = Buffer.from(termios.buffer, 0, 4);
+          var c_oflag = Buffer.from(termios.buffer, 4, 4);
+          var c_cflag = Buffer.from(termios.buffer, 8, 4);
+          var c_lflag = Buffer.from(termios.buffer, 12, 4);
+          var c_line = Buffer.from(termios.buffer, 16, 1);
+          var c_cc = Buffer.from(termios.buffer, 17, 32);
+          var c_ispeed = Buffer.from(termios.buffer, 49, 4);
+          var c_ospeed = Buffer.from(termios.buffer, 53, 4);
   
-  			case 21515: 			// TCFLSH
-  				// int queue_selector;
-  				var queue_selector = getValue(val, 'i32');
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, nBytes);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break;
+          // Set data from ioctl
+          var ptr = getValue(val, '*');
+          setValue(ptr, c_iflag, 'i32');
+          setValue(ptr+4, c_oflag,  'i32');
+          setValue(ptr+8, c_cflag,  'i32');
+          setValue(ptr+12, c_lflag, 'i32');
+          setValue(ptr+16, c_line, 'i8');
+          for (var i =0; i< 32; i++){
+            setValue(ptr+17+i, c_cc[i], 'i8');
+          }
+          setValue(ptr+49, c_ispeed, 'i32');
+          setValue(ptr+53, c_ospeed, 'i32');
   
-  			case 1073834755: 		// SPI_IOC_WR_BITS_PER_WORD
-  				// uint8_t *bitsPerWord;
-  				var ptr = getValue(val, '*');
-  				var bitsPerWord = ref.alloc('uint8', getValue(ptr, 'i8'));
-  				//console.log("Spi bits per word = "+ bitsPerWord.deref());
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, bitsPerWord);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break;
+          break;
+    
+        case 21506:       // TCSETS
   
-  			case 1073834753: 		// SPI_IOC_WR_MODE
-  				// uint8_t *spiDataMode;
-  				var ptr = getValue(val, '*');
-  				var spiDataMode = ref.alloc('uint8', getValue(ptr, 'i8'));
-  				//console.log("Spi data mode = "+ spiDataMode.deref());
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, spiDataMode);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break;
+          //struct termios
+          // {
+          //  tcflag_t c_iflag;   // uint (4 bytes)
+          //  tcflag_t c_oflag;   // uint (4 bytes)
+          //  tcflag_t c_cflag;   // uint (4 bytes)
+          //  tcflag_t c_lflag;   // uint (4 bytes)
+          //  cc_t c_line;        // uchar (1 byte)
+          //  cc_t c_cc[NCCS];    // uchar (32 bytes)
+          //  speed_t __c_ispeed; // uint (4 bytes)
+          //  speed_t __c_ospeed; // uint (4 bytes)
+          // }; // Total: 57 bytes.
   
-  			case 1073834754: 		// SPI_IOC_WR_LSB_FIRST
-  				// uint8_t *spiBitOrder;
-  				var ptr = getValue(val, '*');
-  				var spiBitOrder = ref.alloc('uint8', getValue(ptr, 'i8'));
-  				//console.log("Spi bit order = "+ spiBitOrder.deref());
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, spiBitOrder);
-  				} catch (e) {
-  					// Don't print any error, as we may want to continue if an 
-  					// error happens with this ioclt. (e.g LSB hardware error)
-  				}
-  				break;
+          var c_iflag = Buffer.alloc(4);
+          var c_oflag = Buffer.alloc(4);
+          var c_cflag = Buffer.alloc(4);
+          var c_lflag = Buffer.alloc(4);
+          var c_line = Buffer.alloc(1);
+          var c_cc = Buffer.alloc(32);
+          var c_ispeed = Buffer.alloc(4);
+          var c_ospeed = Buffer.alloc(4);
   
-  			case 1074031364: 		// SPI_IOC_WR_MAX_SPEED_HZ
-  				// uint32_t *spiClock;
-  				var ptr = getValue(val, '*');
-  				var spiClock = ref.alloc('uint32', getValue(ptr, 'i32'));
-  				//console.log("Spi clock = "+ spiClock.deref());
-  				// Call ioctl
-  				try{
-  					ret = ioctl(stream.nfd, cmd, spiClock);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break; 
+          // Get data from pointer
+          var ptr = getValue(val, '*');
+          c_iflag.writeUInt32LE(getValue(ptr, 'i32'));
+          c_oflag.writeUInt32LE(getValue(ptr+4, 'i32'));
+          c_cflag.writeUInt32LE(getValue(ptr+8, 'i32'));
+          c_lflag.writeUInt32LE(getValue(ptr+12, 'i32'));
+          c_line.writeUInt8(getValue(ptr+16, 'i8'));
+          for (var i =0; i< 32; i++){
+            c_cc[i] = getValue(ptr+17+i, 'i8'); 
+          }
+          c_ispeed.writeUInt32LE(getValue(ptr+49, 'i32'));
+          c_ospeed.writeUInt32LE(getValue(ptr+53, 'i32'));
   
-  			case 1075866368: 		// SPI_IOC_MESSAGE(1)
-  				// struct spi_ioc_transfer {
-  				// 	unsigned long long	tx_buf; 		//__u64
-  				// 	unsigned long long	rx_buf; 		//__u64
-  				// 	unsigned int		len;			//__u32
-  				// 	unsigned int		speed_hz;		//__u32
-  				// 	unsigned short		delay_usecs;	//__u16
-  				// 	unsigned char		bits_per_word;	//__u8
-  				// 	unsigned char		cs_change;		//__u8
-  				// 	unsigned char		tx_nbits;		//__u8
-  				// 	unsigned char		rx_nbits;		//__u8
-  				// 	unsigned short		pad;			//__u8
-  				// };
-  				var spi_ioc_transfer = new (ref.StructType({
-  					// pointer to tx_buf and rx_buf was added cuz npm-ioctl 
-  					// doesn't support &tx_buf and &rx_buf dereferencing.  
-  					// Padding was also added to complete 8 bytes. 
-  				    tx_buf : ref.refType('uchar'),
-  				    pad_tx : ref.types.uint,
-  				    rx_buf : ref.refType('uchar'),
-  				    pad_rx : ref.types.uint,
-  				    len : ref.types.uint,
-  				    speed_hz : ref.types.uint,
-  				    delay_usecs : ref.types.ushort,
-  				    bits_per_word : ref.types.uchar,
-  				    cs_change: ref.types.uchar,
-  				    tx_nbits: ref.types.uchar,
-  				    rx_nbits: ref.types.uchar,
-  				    pad: ref.types.ushort
-  				}));
+          // Create termios buffer
+          var termios = Buffer.concat([c_iflag,c_oflag,c_cflag,c_lflag,c_line,c_cc,c_ispeed,c_ospeed]);
   
-  				var ptr = getValue(val, '*');
-  				var ptr_tx = getValue(ptr, '*');
-  				var ptr_rx = getValue(ptr+8, '*');
-  				var numBytes = getValue(ptr+16, 'i32');
-  				var tx = new Buffer.alloc(numBytes);
-  				var rx = new Buffer.alloc(numBytes);
-  				tx.type = ref.types.uchar;
-  				rx.type = ref.types.uchar;
-  				for (var i=0; i < numBytes; i++) {
-  					tx[i] = (0xff & getValue(ptr_tx + i, 'i8'));
-  					rx[i] = (0xff & getValue(ptr_rx + i, 'i8'));
-  				}
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, termios);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
   
-  				spi_ioc_transfer.tx_buf = tx;
-  				spi_ioc_transfer.tx_pad = 0;
-  				spi_ioc_transfer.rx_buf = rx;
-  				spi_ioc_transfer.rx_pad = 0;
-  				spi_ioc_transfer.len = numBytes;
-  				spi_ioc_transfer.speed_hz = getValue(ptr+20, 'i32');
-  				spi_ioc_transfer.delay_usecs = getValue(ptr+24, 'i16');
-  				spi_ioc_transfer.bits_per_word = getValue(ptr+26, 'i8');
-  				spi_ioc_transfer.cs_change = getValue(ptr+27, 'i8');
-  				spi_ioc_transfer.tx_nbits = getValue(ptr+28, 'i8');
-  				spi_ioc_transfer.rx_nbits = getValue(ptr+29, 'i8');
-  				spi_ioc_transfer.pad = getValue(ptr+30, 'i16');
+          break;
+    
+        case 21531:       // FIONREAD
   
-  				try {
-  					// Call ioctl
-  					ret = ioctl(stream.nfd, cmd, spi_ioc_transfer.ref());
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
+          // int *nBytes;
+          var nBytes = Buffer.alloc(4);  
   
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, nBytes);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
   
-  				for (var i=0; i < numBytes; i++) {
-  					setValue(ptr_tx+i, tx[i], 'i8');
-  					setValue(ptr_rx+i, rx[i], 'i8');
-  				}
-  				setValue(ptr+16, spi_ioc_transfer.len, 'i32');
-  				setValue(ptr+20, spi_ioc_transfer.speed_hz, 'i32');
-  				setValue(ptr+24, spi_ioc_transfer.delay_usecs, 'i16');
-  				setValue(ptr+26, spi_ioc_transfer.bits_per_word, 'i8');
-  				setValue(ptr+27, spi_ioc_transfer.cs_change, 'i8');
-  				setValue(ptr+28, spi_ioc_transfer.tx_nbits, 'i8');
-  				setValue(ptr+29, spi_ioc_transfer.rx_nbits, 'i8');
-  				setValue(ptr+30, spi_ioc_transfer.pad, 'i16');
-  				break;
+          // Return availale bytes in stream
+          var ptr = getValue(val, '*');
+          setValue(ptr, nBytes.readUInt32LE(), 'i32');
+          break;
+    
+        case 21515:       // TCFLSH
   
-  			case 1795: 				// I2C_SLAVE
-  				// uint8_t address; 
-  				var address = getValue(val, 'i8');
-  				try{
-  					// Call ioctl
-  					ret = ioctl(stream.nfd, cmd, address);
-  				} catch (e) {
-  					console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
-  				}
-  				break;
+          // int queue_selector;
+          var queue_selector = getValue(val, 'i32');
+          
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, queue_selector);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
   
-  			default: 				// ERROR
-  				console.log("library_ioctls.js: node ioctl cmd "+cmd+" not found");
-  				break;
-  		}
+          break;
   
-  		return ret;
-  	}
+        case 1073834755:    // SPI_IOC_WR_BITS_PER_WORD
+  
+          // uint8_t *bitsPerWord;
+          var ptr = getValue(val, '*');
+          var bitsPerWord = Buffer.from([getValue(ptr, 'i8')]);
+  
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, bitsPerWord);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
+  
+          break;
+  
+        case 1073834753:    // SPI_IOC_WR_MODE
+  
+          // uint8_t *spiDataMode;
+          var ptr = getValue(val, '*');
+          var spiDataMode = Buffer.from([getValue(ptr, 'i8')]);
+  
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, spiDataMode);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
+  
+          break;
+  
+        case 1073834754:    // SPI_IOC_WR_LSB_FIRST
+  
+          // uint8_t *spiBitOrder;
+          var ptr = getValue(val, '*');
+          var spiBitOrder = Buffer.from([getValue(ptr, 'i8')]);
+  
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, spiBitOrder);
+          } catch (e) {
+            // Don't print any error, as we may want to continue if an 
+            // error happens with this ioclt. (e.g LSB hardware error)
+          }
+  
+          break;
+  
+        case 1074031364:    // SPI_IOC_WR_MAX_SPEED_HZ
+  
+          // uint32_t *spiClock;
+          var ptr = getValue(val, '*');
+          var spiClock = Buffer.alloc(4);
+          spiClock.writeUInt32LE(getValue(ptr, 'i32'));
+  
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, spiClock);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
+  
+          break; 
+  
+        case 1075866368:    // SPI_IOC_MESSAGE(1)
+  
+          // struct spi_ioc_transfer {
+          //  unsigned long long  tx_buf;     // 8 bytes // Pointer
+          //  unsigned long long  rx_buf;     // 8 bytes // Pointer
+          //  unsigned int    len;            // 4 bytes
+          //  unsigned int    speed_hz;       // 4 bytes
+          //  unsigned short  delay_usecs;    // 2 bytes
+          //  unsigned char   bits_per_word;  // 1 byte
+          //  unsigned char   cs_change;      // 1 byte
+          //  unsigned char   tx_nbits;       // 1 byte
+          //  unsigned char   rx_nbits;       // 1 byte
+          //  unsigned short  pad;            // 2 bytes
+          // }; // Total 32 bytes
+  
+          var ptr = getValue(val, '*');
+          var ptr_tx = getValue(ptr, '*');
+          var ptr_rx = getValue(ptr+8, '*');
+          var numBytes = getValue(ptr+16, 'i32');
+  
+          var tx =  Buffer.alloc(numBytes);
+          var rx =  Buffer.alloc(numBytes);
+          for (var i=0; i < numBytes; i++) {
+            tx[i] = (0xff & getValue(ptr_tx + i, 'i8'));
+            rx[i] = 0x00;
+          }
+  
+          // Get pointer to tx buffer and set pading if needed
+          var tx_buf = Buffer.from(tx.memAddressLE(),'hex');
+          var tx_pad = Buffer.alloc(0);
+          if (tx_buf.length == 4) {
+            // Is 32-bit Architecture so add a padding
+            tx_pad = Buffer.alloc(4); 
+          }
+  
+          // Get pointer to rx buffer and set pading if needed
+          var rx_buf = Buffer.from(rx.memAddressLE(),'hex');
+          var rx_pad = Buffer.alloc(0);
+          if (rx_buf.length == 4) {
+            // Is 32-bit Architecture so add a padding
+            rx_pad = Buffer.alloc(4); 
+          }
+  
+          var len = Buffer.alloc(4);
+          var speed_hz = Buffer.alloc(4);
+          var delay_usecs = Buffer.alloc(2);
+          var bits_per_word = Buffer.alloc(1);
+          var cs_change = Buffer.alloc(1);
+          var tx_nbits = Buffer.alloc(1);
+          var rx_nbits = Buffer.alloc(1);
+          var pad = Buffer.alloc(2);
+  
+          len.writeUInt32LE(numBytes);
+          speed_hz.writeUInt32LE(getValue(ptr+20, 'i32'));
+          delay_usecs.writeUInt16LE(getValue(ptr+24, 'i16'));
+          bits_per_word.writeUInt8(getValue(ptr+26, 'i8'));
+          cs_change.writeUInt8(getValue(ptr+27, 'i8'));
+          tx_nbits.writeUInt8(getValue(ptr+28, 'i8'));
+          rx_nbits.writeUInt8(getValue(ptr+29, 'i8'));
+          pad.writeUInt16LE(getValue(ptr+30, 'i16'));
+  
+          // Create spi_ioc_transfer struct
+          var spi_ioc_transfer = Buffer.concat([tx_buf,tx_pad,rx_buf,rx_pad,
+            len,speed_hz,delay_usecs,bits_per_word,cs_change,tx_nbits,rx_nbits,pad]);
+  
+          // Call ioctl
+          try {       
+            ret = ioctl(stream.nfd, cmd, spi_ioc_transfer);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          };
+  
+          // Set rx buffer with received data
+          for (var i=0; i < numBytes; i++) {
+            setValue(ptr_rx+i, rx[i], 'i8');
+          }
+  
+          break;
+  
+        case 1795:        // I2C_SLAVE
+  
+          // uint8_t address; 
+          var address = getValue(val, 'i8');
+  
+          // Call ioctl
+          try{
+            ret = ioctl(stream.nfd, cmd, address);
+          } catch (e) {
+            console.log("library_ioctls.js: node ioctl cmd "+cmd+" "+e);
+          }
+  
+          break;
+  
+        default:        // ERROR
+          console.log("library_ioctls.js: node ioctl cmd "+cmd+" not found");
+          break;
+        }
+  
+      return ret;
+    }
 
   function _pthread_cancel() {}
 

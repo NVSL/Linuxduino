@@ -1,5 +1,4 @@
 #include "Linuxduino.h"
-#include "unistd.h" // For sleep()
 
 // Testing Serial peek
 // peek, -1 when nothing and afected by timeOut 
@@ -9,13 +8,11 @@ int main(void) {
     char peekChar;
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
         
     // Note: peek should not block.
     printf("Write Something...\n");
-    sleep(5);
-    peekChar = Serial.peek();
-    printf("Your next char is = %c\n", peekChar);
+    delay(5000);
     peekChar = Serial.peek();
     printf("Your next char is = %c\n", peekChar);
 

@@ -1,31 +1,30 @@
 #include "Linuxduino.h"
-#include "unistd.h" // For sleep()
 
-// Testing SPI settings
+// Testing SPI set/get
 int main(void) {
 
     char ret;
 
-#ifdef __EMSCRIPTEN__
-    setSPI("/devices/spidev0.0");
-    SPI.begin();
-#else 
     setSPI("/dev/spidev0.0");
-    SPI.begin();
-#endif
-
     printf("Current SPI Driver = %s \n", getSPI());
 
+    // Open SPI port
+    SPI.begin();
+
+    // Set SPI Settings
     SPISettings settingsA(SPI_CLOCK_DIV64, MSBFIRST, SPI_MODE3);
+
+    // Send Hello World!
     SPI.beginTransaction(settingsA);
     // Note in SPI the last character will not be printed here. 
     // In SPI you recieve what you sent previously. 
-    for (const char *p = "Hello, world!\n" ; *p!=0 ; p++) {
-        ret = SPI.transfer (*p);
+    for (const char *msg = "Hello World!\n" ; *msg!=0 ; msg++) {
+        ret = SPI.transfer(*msg);
         printf("%c", ret);
     }
-    printf("\n");
     SPI.endTransaction();
+    printf("\n");
+    
     SPI.end(); 
     return 1;
 }

@@ -476,6 +476,11 @@ long SerialLinux::parseInt(char ignore)
     return value;
 }
 
+long SerialLinux::parseInt_js(std::string ignore)
+{
+    return parseInt((char)(ignore.c_str()[0]));
+}
+
 // Returns the next byte (character) of incoming serial data
 // without removing it from the internal serial buffer.
 int SerialLinux::peek()
@@ -687,9 +692,10 @@ size_t SerialLinux::readBytes(char buffer[], size_t length)
     return count;
 }
 
-size_t SerialLinux::readBytes_js(std::string buffer, size_t length)
+std::string SerialLinux::readBytes_js(std::string buffer, size_t length)
 {
-    return readBytes((char *)buffer.c_str(), length);
+    readBytes((char *)buffer.c_str(), length);
+    return buffer;
 }
 
 // Reads characters from the serial buffer into an array. 
@@ -715,9 +721,10 @@ size_t SerialLinux::readBytesUntil(char terminator, char buffer[], size_t length
     return count;
 }
 
-size_t SerialLinux::readBytesUntil_js(char terminator, std::string buffer, size_t length)
+std::string SerialLinux::readBytesUntil_js(std::string terminator, std::string buffer, size_t length)
 {
-    return readBytesUntil(terminator, (char *)buffer.c_str(), length);
+    readBytesUntil((char)terminator.c_str()[0], (char *)buffer.c_str(), length);
+    return buffer;
 }
 
 // Read a String until timeout
@@ -767,6 +774,7 @@ String SerialLinux::readStringUntil(char terminator)
     do {
         if (available()) {
             unistd::read(fd,&c,1);
+            if (c == terminator) break;
             ret += (char)c;
         }
         clock_gettime(CLOCK_REALTIME, &time2);
@@ -785,12 +793,18 @@ std::string SerialLinux::readStringUntil_std(char terminator)
     do {
         if (available()) {
             unistd::read(fd,&c,1);
+            if (c == terminator) break;
             ret += (char)c;
         }
         clock_gettime(CLOCK_REALTIME, &time2);
         if (timeDiffmillis(time1,time2) > timeOut) break;
     } while (c >= 0 && c != terminator);
     return ret;
+}
+
+std::string SerialLinux::readStringUntil_js(std::string terminator)
+{
+    return readStringUntil_std((char)terminator.c_str()[0]);
 }
 
 // Reads a string unitl a termintor is given, this function blocks until the terminator is found.
@@ -813,9 +827,10 @@ size_t SerialLinux::readStringCommand(char terminator, char buffer[], size_t len
     return count;
 }
 
-size_t SerialLinux::readStringCommand_js(char terminator, std::string buffer, size_t length)
+std::string SerialLinux::readStringCommand_js(std::string terminator, std::string buffer, size_t length)
 {
-    return readStringCommand(terminator, (char *) buffer.c_str(), length);
+    readStringCommand((char)terminator.c_str()[0], (char *) buffer.c_str(), length);
+    return buffer;
 }
 
 // Sets the maximum milliseconds to wait for serial data when using 
@@ -935,8 +950,8 @@ SerialLinux Serial = SerialLinux();
     EMSCRIPTEN_BINDINGS(Serial) {
         constant("DEC", DEC);
         constant("HEX", HEX);
-        constant("BIN", OCT);
-        constant("OCT", BIN);
+        constant("BIN", BIN);
+        constant("OCT", OCT);
         constant("SERIAL_5N1", SERIAL_5N1);
         constant("SERIAL_6N1", SERIAL_6N1);
         constant("SERIAL_7N1", SERIAL_7N1);
@@ -979,13 +994,13 @@ SerialLinux Serial = SerialLinux();
             .function("availableForWrite", &SerialLinux::availableForWrite)
             .function("find", 
                 select_overload<bool(std::string)>(&SerialLinux::find))
-            .function("findUnitl", 
+            .function("findUntil", 
                 select_overload<bool(std::string, std::string)>(&SerialLinux::findUntil))
             .function("flush", &SerialLinux::flush)
             .function("parseInt", 
                  select_overload<long()>(&SerialLinux::parseInt))
             .function("parseInt", 
-                 select_overload<long(char)>(&SerialLinux::parseInt))
+                 select_overload<long(std::string)>(&SerialLinux::parseInt_js))
             .function("parseFloat", &SerialLinux::parseFloat)
             .function("peek", &SerialLinux::peek)
             .function("print",
@@ -997,8 +1012,7 @@ SerialLinux Serial = SerialLinux();
                  select_overload<size_t(unsigned char, int)>(&SerialLinux::print))
             .function("print",
                  select_overload<size_t(int, int)>(&SerialLinux::print))
-            .function("print",
-                 select_overload<size_t(unsigned int, int)>(&SerialLinux::print))
+            // Serial.print(unsigned int, int) :: NOT NECESSARY
             .function("println",
                  select_overload<size_t(std::string)>(&SerialLinux::println))
             // Serial.println(char) :: NO TYPE OVERLAD WITH EMBIND (Added as println_byte)
@@ -1008,14 +1022,13 @@ SerialLinux Serial = SerialLinux();
                  select_overload<size_t(unsigned char, int)>(&SerialLinux::println))
             .function("println",
                  select_overload<size_t(int, int)>(&SerialLinux::println))
-            .function("println",
-                 select_overload<size_t(unsigned int, int)>(&SerialLinux::println))
+            // Serial.println(unsigned int, int) :: NOT NECESSARY
             // Serial.printf :: NOT POSSIBLE IN JS
             .function("read", &SerialLinux::read)
             .function("readBytes", &SerialLinux::readBytes_js)
             .function("readBytesUntil", &SerialLinux::readBytesUntil_js)
             .function("readString", &SerialLinux::readString_std)
-            .function("readStringUntil", &SerialLinux::readStringUntil_std)
+            .function("readStringUntil", &SerialLinux::readStringUntil_js)
             .function("readStringCommand", &SerialLinux::readStringCommand_js)
             .function("setTimeout", &SerialLinux::setTimeout)
             // Serial.write(uint8_t) :: NO TYPE OVERLAD WITH EMBIND (Added as write_byte)

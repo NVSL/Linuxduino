@@ -1,27 +1,40 @@
 #include "Linuxduino.h"
 
-// Testing spi transfer(buf,len)
+// Testing spi transfer()
 int main(void) {
 
-#ifdef __EMSCRIPTEN__
-    SPI.begin("/devices/spidev0.0");
-#else 
+    // Open SPI port
     SPI.begin("/dev/spidev0.0");
-#endif
 
+    // Set SPI Settings
     SPI.setClockDivider(SPI_CLOCK_DIV64);
     SPI.setBitOrder(MSBFIRST);
     SPI.setDataMode(SPI_MODE3);
 
-    char c[] =  "Hello, World!-";
-    SPI.transfer (c, strlen(c));
-
-    printf("Data Recieved = \n");
-    // The last character sent will be printed first after
-    for (unsigned int i=0; i<strlen(c); i++){
-         printf("%c",c[i]);
+    // Test transfer(buffer, len)
+    char msg[] = "Hello World!\n";
+    SPI.transfer(msg, strlen(msg)); // Send Hello World!\n
+    printf("Data Recieved = ");
+    for (unsigned int i=0; i<strlen(msg); i++){
+         printf("%c",msg[i]);
     }
     printf("\n");
+
+    // Test transfer(buffer, len)
+    char msg2[2] = {0x41, 0x0A};
+    SPI.transfer(msg2, 2); // Send A\n
+    printf("Data Recieved = ");
+    for (unsigned int i=0; i<strlen(msg); i++){
+         printf("%c",msg[i]);
+    }
+    printf("\n");
+
+    // Test transfer(byte)
+    char ret;
+    ret = SPI.transfer(0x42); // Send 'B'
+    printf("Data Recieved = %c\n", ret);
+    ret = SPI.transfer(0x0A); // Send '\n'
+    printf("Data Recieved = %c\n", ret);
 
     SPI.end(); 
     return 1;

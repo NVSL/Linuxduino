@@ -1,20 +1,24 @@
 #include "Linuxduino.h"
 
-// Testing I2C write
+// Testing set/get I2C device name
 int main(void) {
 
-#ifdef __EMSCRIPTEN__
-    setWire("/devices/i2c-1");
-    Wire.begin();
-#else 
     setWire("/dev/i2c-1");
-    Wire.begin();
-#endif
-
     printf("Current I2C Driver = %s \n", getWire());
-    Wire.beginTransmission(8);
+
+    // Open I2C port
+    Wire.begin(); 
+
+    Wire.beginTransmission(8); // 7-bit device I2C address
     Wire.write("Hello World");
-    Wire.endTransmission();
+    int bytes_transmitted = Wire.endTransmission();
+    // Make sure transmission was sucessful
+    if (bytes_transmitted == 0 ) {
+        printf("Wrong I2C address or I2C wires may not be connected properly\n");
+        return -1;
+    }
+    printf("Hello World msg sent! \n");
+
     Wire.end();
     return 1;
 }

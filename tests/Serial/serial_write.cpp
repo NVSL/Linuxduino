@@ -12,6 +12,7 @@ int main(void) {
         Serial.write('A');
         Serial.write("Lol");
         Serial.write(buff, strlen(buff));
+        Serial.write(0x41); // Sends explicit byte
         Serial.write('\r');
         Serial.write('\n');
     }

@@ -1,5 +1,4 @@
 #include "Linuxduino.h"
-#include "unistd.h" // For sleep()
 
 // Testing Serial read and available
 int main(void) {
@@ -8,12 +7,12 @@ int main(void) {
     int availableBytes;
 
     // Open Serial
-    Serial.begin("/dev/ttyUSB0", 115200, SERIAL_8N1);
+    Serial.begin("/dev/ttyUSB0", 115200);
     
     printf("Write Something...\n");
-    sleep(5);
+    delay(5000);
 
-    // send data only when you receive data:
+    // Check if there is available data:
     if ((availableBytes = Serial.available()) > 0) {
 
         printf("Available bytes = %d\n", availableBytes);

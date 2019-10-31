@@ -3,19 +3,23 @@
 // Testing I2C write
 int main(void) {
 
-    char world[] = "World!";
+    char world[] = "World";
 
-#ifdef __EMSCRIPTEN__
-    Wire.begin("/devices/i2c-1");
-#else 
     Wire.begin("/dev/i2c-1");
-#endif
 
-    Wire.beginTransmission(8);
+    // Send Hello World! to device
+    Wire.beginTransmission(8); // 7-bit device I2C address
     Wire.write("Hello");
-    Wire.write('|');
+    Wire.write(' ');
     Wire.write(world, strlen(world));
-    Wire.endTransmission();
+    int bytes_transmitted = Wire.endTransmission();
+    // Make sure transmission was sucessful
+    if (bytes_transmitted == 0 ) {
+    	printf("Wrong I2C address or I2C wires may not be connected properly\n");
+    	return -1;
+    }
+    printf("Hello World msg sent! \n");
+
     Wire.end();
     return 1;
 }

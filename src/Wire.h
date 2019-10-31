@@ -59,8 +59,8 @@ class WireLinux {
 
         static uint16_t transmitting;
 
-        int i2c_write_bytes(int file, uint8_t *txBuff, size_t numBytes);
-        int i2c_read_bytes(int file, uint8_t *rxBuff, size_t numBytes);
+        int i2c_write_bytes(int file, uint8_t *txBuff, int numBytes);
+        int i2c_read_bytes(int file, uint8_t *rxBuff, int numBytes);
 
 	public:
 		WireLinux();
@@ -68,14 +68,14 @@ class WireLinux {
     void begin(std::string i2cDeviceName);
 		void begin(const char *i2cDeviceName);
 		void end();
-		uint8_t  requestFrom(uint8_t address, size_t quantity);
+		int  requestFrom(uint8_t address, int quantity);
 		void beginTransmission(uint8_t address);
-		uint8_t endTransmission();		
-		size_t write(uint8_t data);
-    size_t write(std::string data);
-		size_t write(const char *data);
-		size_t write(void *data, size_t quantity);
-    size_t write_js(std::string data, size_t quantity);
+		int endTransmission();		
+		int write(uint8_t data);
+    int write(std::string data);
+		int write(const char *data);
+		int write(void *data, int quantity);
+    int write_js(std::string data, int quantity);
 		int available(void);
 		int read(void);
 };
