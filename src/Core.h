@@ -27,7 +27,7 @@
 
 
 // General Library Version 
-#define LINUXDUINO_VERSION "1.0.1"
+#define LINUXDUINO_VERSION "0.2.5"
 
 // // Number of Pins in SoC
 #ifndef SOC_GPIO_PINS

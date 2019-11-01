@@ -1,6 +1,6 @@
 #include "Linuxduino.h"
 
-// Test RANDOM NUMBERS
+// Test RANDOM NUMBERS functions
 int main(void) {
 
     randomSeed(10);
