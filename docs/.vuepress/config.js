@@ -1,10 +1,11 @@
 module.exports = {
   base: "/Linuxduino/",
-  title: "Linuxduino 1.x",
+  title: "Linuxduino 0.2.0",
+  port: "8085",
   description: "Linuxduino documentation",
   themeConfig: {
     // Assumes GitHub. Can also be a full GitLab url.
-    repo: "lusaxweb/vuesax",
+    repo: "NVSL/Linuxduino",
     // if your docs are not at the root of the repo:
     docsDir: "docs",
     // if your docs are in a specific branch (defaults to 'master'):
@@ -26,9 +27,21 @@ module.exports = {
         ]
       },
       {
-        title: "GPIO",
+        title: "Reference",
+        path: "/reference/",
         collapsable: false,
         children: []
+      },
+      {
+        title: "Constants and Data Types",
+        path: "/constantsAndTypes/",
+        collapsable: false,
+        children: []
+      },
+      {
+        title: "GPIO",
+        collapsable: false,
+        children: ["/gpio/pinMode", "/gpio/digitalWrite", "/gpio/digitalRead"]
       },
       {
         title: "Serial",

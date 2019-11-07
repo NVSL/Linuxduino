@@ -1,0 +1,1 @@
+## Available C++ and JavaScript Functions

@@ -1,16 +1,31 @@
 ---
 home: true
-heroImage: /hero.png
+heroImage: ""
 heroText: Linuxduino 
 tagline: 
 actionText: Get Started →
 actionLink: /start/
 features:
-- title: Simplicity First
-  details: Minimal setup with markdown-centered project structure helps you focus on writing.
-- title: Vue-Powered
-  details: Enjoy the dev experience of Vue + webpack, use Vue components in markdown, and develop custom themes with Vue.
-- title: Performant
-  details: VuePress generates pre-rendered static HTML for each page, and runs as an SPA once a page is loaded.
-footer: MIT Licensed | Copyright © 2018-present Evan You
+- title: Any Linux embedded board
+  details: Use Linuxduino with any embedded board running linux (e.g., Raspberry Pi, Dragonboard 410c, etc)
+- title: Arduino language compatible
+  details: Use the same Arduino programing language style you already know.
+- title: IoT Enabled
+  details: Use C++ or the JavaScript version to enabling fast integration with the internet of things.
+footer: MIT Licensed | Copyright © 2019-present 
 ---
+
+## Install 
+
+### JavaScript
+::: warning
+linuxduino requires Node v8 or above
+:::
+```sh
+npm install linuxduino
+```
+
+### C++
+```sh
+todo
+```
