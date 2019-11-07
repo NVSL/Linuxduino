@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-// Test Arduino digitalWrite
+// Test Arduino style digitalWrite
 
 int ledPin = 4; // GPIO4
 

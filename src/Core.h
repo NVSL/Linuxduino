@@ -29,10 +29,9 @@
 // General Library Version 
 #define LINUXDUINO_VERSION "0.2.5"
 
-// // Number of Pins in SoC
+// Max number of GPIO Pins available (Contact me if you need more pins)
 #ifndef SOC_GPIO_PINS
-  // Total Number of GPIOs Pins in BCM283x SoC chips
-  #define SOC_GPIO_PINS 54
+  #define SOC_GPIO_PINS 256
 #endif
 
 // Remove some PROGMEM space macros if possible
@@ -320,7 +319,6 @@ typedef unsigned int word;
 #define OUTPUT 0x01
 #define INPUT_PULLUP 0x02
 #define INPUT_PULLDOWN 0x03
-#define PWM_OUTPUT 0x04
 
 // RPI Hardware Pin modes
 #define RPI_HDW 0x01

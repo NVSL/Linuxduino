@@ -109,7 +109,7 @@ static volatile uint32_t *clk_map = NULL;
 static bool g_open_pwmmem_flag = false;
 
 
-// Sets pin (gpio) mode as INPUT,INTPUT_PULLUP,INTPUT_PULLDOWN,OUTPUT,PWM_OUTPUT
+// Sets pin (gpio) mode as INPUT,INTPUT_PULLUP,INTPUT_PULLDOWN,OUTPUT
 void pinMode(uint8_t pin, uint8_t mode)
 {
     // ALL_HDW varaibles
@@ -125,7 +125,7 @@ void pinMode(uint8_t pin, uint8_t mode)
     int gpio_fsel_alt = 0;
     int pwm_channel = 0;
 
-    // Check if the pin number is valid
+    // Check if the pin number is valid (Contact me if your board needs more pins)
     if (pin >= SOC_GPIO_PINS) {
         fprintf(stderr, "%s(): pin number should be less than "
             "%d, yours is %d \n", __func__, SOC_GPIO_PINS, pin);
@@ -137,7 +137,6 @@ void pinMode(uint8_t pin, uint8_t mode)
         case OUTPUT:
         case INPUT_PULLUP:
         case INPUT_PULLDOWN:
-        case PWM_OUTPUT:
 
             // Export pin for interrupt
             asprintf(&dir_path, "/sys/class/gpio/gpio%d/direction", pin);
@@ -175,7 +174,7 @@ void pinMode(uint8_t pin, uint8_t mode)
                 // INPUT
                 fprintf(fp,"in");
             } else {
-                // OUTPUT, PWM_OUTPUT
+                // OUTPUT
                 fprintf(fp,"out");
             }
             fclose(fp);
@@ -200,6 +199,7 @@ void pinMode(uint8_t pin, uint8_t mode)
             g_pwm_dutycycle_value[pin] = 0;
             break;
 
+        // Raspberry PI bcm2078 legacy modes
         case RPI_INPUT:
         case RPI_OUTPUT:
         case RPI_INPUT_PULLUP:
@@ -1403,7 +1403,6 @@ ArduinoLinux Arduino = ArduinoLinux();
         constant("OUTPUT", OUTPUT);
         constant("INPUT_PULLUP", INPUT_PULLUP);
         constant("INPUT_PULLDOWN", INPUT_PULLDOWN);
-        constant("PWM_OUTPUT", PWM_OUTPUT);
             // TODO: RPI_... constants
         function("pinMode", &pinMode);
         function("digitalWrite", &digitalWrite);

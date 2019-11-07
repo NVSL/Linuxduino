@@ -2,7 +2,7 @@
 
 // Test digitalRead
 int main(void) {
-    int ledPin = 17; // GPIO4
+    int ledPin = 17; // Embedded board GPIO Number
     int input = 0;
     pinMode(ledPin, INPUT);
     while(1) {

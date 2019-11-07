@@ -1,6 +1,6 @@
 #include "Arduino.h"
 
-// Test Arduino digitalRead
+// Test Arduino style digitalRead
 
 int ledPin = 17; // GPIO4
 int input = 0;
