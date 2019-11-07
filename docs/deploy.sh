@@ -4,7 +4,7 @@
 set -e
 
 # build
-#vuepress buld
+vuepress build
 
 # navigate into the build output directory
 cd .vuepress/dist
