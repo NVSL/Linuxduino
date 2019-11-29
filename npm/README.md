@@ -4,7 +4,7 @@ A javscript library for communicating with hardware in a Arduino style programmi
 **Note**: This library is currently in Beta.   
 This library is intended to be used with **Node >= v8.0.0** and **Electron (Todo version)**. 
 
-Documentation currently under construction:
+Documentation currently under construction:  
 https://nvsl.github.io/Linuxduino/ 
 
 # Install
