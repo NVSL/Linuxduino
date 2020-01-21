@@ -1,5 +1,28 @@
-# setSPI() & getSPI()
+# (extra) setSPI() & getSPI()
 
+## Syntax 
+```
+setSPI(spiDeviceName)
+``` 
+
+## Parameters
+
+***spiDeviceName***:   
+The device path of the spi device (e.g., "/dev/spidev0.0").
+
+## Returns
+None
+
+## Syntax 
+```
+setSerialPort = getSerial()
+```
+## Parameters 
+None
+
+## Returns
+
+Returns the current set spi device (e.g., "/dev/spidev0.0") or empty string if no spi device is set.   
 
 ## Example
 
@@ -14,7 +37,7 @@ const linuxduino = require('linuxduino');
     
     // Set SPI device name
     linuxduino.setSPI("/dev/spidev0.0");
-    console.log(linuxduino.getSPI());
+    console.log("Current SPI Driver = ", linuxduino.getSPI());
 
     // Open SPI port
     SPI = new linuxduino.SPI();

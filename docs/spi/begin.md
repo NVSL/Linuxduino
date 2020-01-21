@@ -1,14 +1,16 @@
-# SPI.beginTransaction()
-Initializes the SPI bus using the defined SPISettings.
+# SPI.begin()
 
 ## Syntax 
 ```
-SPI.beginTransaction(mySettings);
+SPI.begin() // Only available with setSPI()
+(extra) SPI.begin(spiDeviceName)
 ``` 
+See [setSPI()](/spi/getset)
 
 ## Parameters 
-***mySettings***:   
-The chosen settings according to [SPISettings](/spi/SPISettings).
+
+***spiDeviceName***:   
+The linux spi device path (e.g., "/dev/spidev0.0").
 
 ## Returns 
 None

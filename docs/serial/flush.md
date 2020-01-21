@@ -1,5 +1,9 @@
 # Serial.flush()
 
+## Syntax 
+```
+Serial.flush()
+``` 
 
 ## Example
 

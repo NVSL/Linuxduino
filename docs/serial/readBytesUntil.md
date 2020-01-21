@@ -1,5 +1,19 @@
 # Serial.readBytesUntil()
 
+## Syntax 
+```
+Serial.readBytesUntil(terminator, buffer, length)
+``` 
+## Parameters 
+
+***terminator***:   
+
+***buffer***:   
+
+***length***:   
+
+
+## Returns
 
 ## Example
 

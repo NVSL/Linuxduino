@@ -75,7 +75,7 @@ sudo ./digitalWrite
 
 Check the [Reference](/reference/) to see the full list of implemented functions and examples. 
 
-## Arduino style compatibility
+## Arduino style compatibility for C++
 
 C++ programs can also use the Arduino programming style by including the 
 ```Arduino.h``` instead of ```Linuxduino.h``` header and compiling them 

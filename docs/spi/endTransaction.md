@@ -1,17 +1,16 @@
-# SPI.beginTransaction()
-Initializes the SPI bus using the defined SPISettings.
+# SPI.endTransaction()
+Currently this function does nothing, kept for legacy.
 
 ## Syntax 
 ```
-SPI.beginTransaction(mySettings);
+SPI.endTransaction()
 ``` 
 
-## Parameters 
-***mySettings***:   
-The chosen settings according to [SPISettings](/spi/SPISettings).
-
-## Returns 
+## Parameters
 None
+
+## Returns
+None 
 
 ## Example
 

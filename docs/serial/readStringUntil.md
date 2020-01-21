@@ -1,5 +1,14 @@
 # Serial.readStringUntil()
 
+## Syntax 
+```
+Serial.readStringUntil(terminator)
+``` 
+## Parameters 
+
+***terminator***:    
+
+## Returns
 
 ## Example
 

@@ -1,5 +1,36 @@
 # Serial.print() & Serial.println()
 
+## Syntax 
+```
+Serial.print(str)
+Serial.print(n, base)
+(extra) Serial.print_byte(byte) // JavaScript only
+``` 
+*Serial.println() is the same but adds a new line at the end.   
+
+::: info   
+Serial.print_byte() is only available for JavaScript and enables sending byte data directly.
+:::
+
+## Parameters
+
+***str***:   
+
+***n***: 
+
+***base***: 
+
+*Available bases*:   
+**DEC**: prints as decimal ascii text   
+**HEX**: prints as hexadecimal ascii text   
+**BIN**: prints as binary ascii text   
+**OCT**: prints as octal ascii text  
+
+***byte***:   
+
+
+## Returns
+
 
 ## Example
 

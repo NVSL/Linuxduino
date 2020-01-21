@@ -1,4 +1,21 @@
-## digitalRead()  
+# digitalRead()  
+
+Reads the value from a specified digital pin, either HIGH or LOW.
+
+## Syntax 
+```
+digitalRead(pin)
+```
+## Parameters
+
+***pin***:   
+  
+The embedded board GPIO number. Must be a range from 0 to 256. 
+If your embedded board GPIO goes over the available range contact me (jgarzagu at ucsd.edu). 
+
+## Returns
+
+HIGH or LOW
 
 ## Example
 

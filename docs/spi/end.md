@@ -1,14 +1,13 @@
-# SPI.beginTransaction()
-Initializes the SPI bus using the defined SPISettings.
+# SPI.end() 
+Disables the SPI bus (leaving pin modes unchanged).
 
 ## Syntax 
 ```
-SPI.beginTransaction(mySettings);
+SPI.end()
 ``` 
 
 ## Parameters 
-***mySettings***:   
-The chosen settings according to [SPISettings](/spi/SPISettings).
+None
 
 ## Returns 
 None

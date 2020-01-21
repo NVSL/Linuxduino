@@ -1,5 +1,31 @@
 # Serial.write()
 
+## Syntax 
+```
+Serial.write(str)
+Serial.write(buffer, size)
+(extra) Serial.write_byte(byte) // JavaScript only
+``` 
+
+::: info 
+Serial.write_byte() bla bla TODO
+:::
+
+## Parameters 
+
+***str***:   
+
+***buffer***:   
+
+***size***:   
+
+***byte***:  
+
+## Returns
+
+## Example
+
+### Javascript 
 
 ## Example
 

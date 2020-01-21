@@ -1,6 +1,13 @@
 # Serial.readString()
 
 
+## Syntax 
+```
+Serial.readString()
+``` 
+
+## Returns
+
 ## Example
 
 ### Javascript 

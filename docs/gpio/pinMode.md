@@ -1,4 +1,6 @@
-## pinMode() 
+# pinMode() 
+
+Configures the specified pin to behave either as an input or an output.  
 
 ## Syntax 
 ```
@@ -15,20 +17,21 @@ If your embedded board GPIO goes over the available range contact me (jgarzagu a
   
 Standard modes:  
 **INPUT**: Sets GPIO pin number as input.  
-**INPUT_PULLDOWN**: Same effect as INPUT since some embedded boards doesn't have PULL resistos internally.    
-**INPUT_PULLUP**: Same effect as INPUT since some embedded boards doesn't have PULL resistos internally.  
-**OUTPUT**: Sets GPIO pin number as output. 
+**OUTPUT**: Sets GPIO pin number as output.   
+**INPUT_PULLDOWN**: Same as INPUT since some embedded boards doesn't have PULL resistos internally.    
+**INPUT_PULLUP**: Same as INPUT since some embedded boards doesn't have PULL resistos internally.  
 
 
-Raspberry Pi BCM283x legacy modes:  
-**RPI_INPUT**: Sets GPIO pin number as input using "/dev/mem" mapping.  
-**RPI_INPUT_PULLDOWN**: Sets GPIO pin number as input and with a pull down resistor using "/dev/mem" mapping   
-**RPI_INPUT_PULLUP**: Sets GPIO pin number as input and with a pull up resistor using "/dev/mem" mapping   
-**RPI_OUTPUT**: Sets GPIO pin number as output using "/dev/mem" mapping.  
-**RPI_PWM_OUTPUT**: Sets GPIO pin number as PWM "/dev/mem" mapping. (TODO add available pins for RPi)  
+Raspberry Pi BCM283x legacy modes: 
 ::: warning
 Raspberry Pi BCM283x legacy modes only work in C++. 
-:::
+::: 
+**RPI_INPUT**: Sets GPIO pin number as input using "/dev/mem" mapping.  
+**RPI_OUTPUT**: Sets GPIO pin number as output using "/dev/mem" mapping.  
+**RPI_INPUT_PULLDOWN**: Sets GPIO pin number as input and with a pull down resistor using "/dev/mem" mapping   
+**RPI_INPUT_PULLUP**: Sets GPIO pin number as input and with a pull up resistor using "/dev/mem" mapping   
+**RPI_PWM_OUTPUT**: Sets GPIO pin number as PWM "/dev/mem" mapping. (TODO add available pins for RPi)  
+
 
 ## Example
 

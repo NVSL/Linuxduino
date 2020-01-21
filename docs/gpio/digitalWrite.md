@@ -1,4 +1,21 @@
-## digitalWrite()  
+# digitalWrite()  
+
+Writes a HIGH or a LOW value to a digital pin. 
+
+## Syntax 
+```
+digitalWrite(pin, value)
+```
+## Parameters
+
+***pin***:   
+  
+The embedded board GPIO number. Must be a range from 0 to 256. 
+If your embedded board GPIO goes over the available range contact me (jgarzagu at ucsd.edu). 
+
+***value***:
+
+HIGH or LOW
 
 ## Example
 

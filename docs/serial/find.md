@@ -1,5 +1,22 @@
 # Serial.find()
 
+## Syntax 
+```
+Serial.find(target)
+``` 
+
+## Parameters
+
+***target***:   
+
+## Returns 
+
+
+## Example
+
+### Javascript 
+
+### C++
 
 ## Example
 

@@ -1,5 +1,24 @@
-# Serial.parseInt() & Serial.ParseFloat()
+# Serial.parseFloat() & Serial.parseInt()
 
+## Syntax 
+```
+Serial.parseFloat()
+``` 
+
+## Returns 
+
+## Syntax 
+```
+Serial.parseInt()
+Serial.parseInt(ignore)
+``` 
+
+## Parameters
+
+***ignore***:   
+
+
+## Returns 
 
 ## Example
 

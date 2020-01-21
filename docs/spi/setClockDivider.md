@@ -1,5 +1,27 @@
-# SPI.set*()
+# SPI.setClockDivider()
+Sets the SPI clock divider relative to the system clock.
 
+## Syntax 
+```
+SPI.setClockDivider(divider)
+``` 
+
+## Parameters 
+***divider***:   
+The maximum SPI clock speed.
+
+*Available speeds*:   
+
+**SPI_CLOCK_DIV2**: SPI clock to 8000000 (8 Mhz)   
+**SPI_CLOCK_DIV4**: SPI clock to 4000000 (4 Mhz)   
+**SPI_CLOCK_DIV8**: SPI clock to 2000000 (2 Mhz)   
+**SPI_CLOCK_DIV16**: SPI clock to 1000000 (1 Mhz)   
+**SPI_CLOCK_DIV32**: SPI clock to 500000 (500 khz)   
+**SPI_CLOCK_DIV64**: SPI clock to 250000 (250 khz)   
+**SPI_CLOCK_DIV128**: SPI clock to 125000 (125 khz)  
+
+## Returns 
+None
 
 ## Example
 

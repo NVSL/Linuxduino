@@ -1,5 +1,30 @@
 # SPI.transfer()
+Transfer and recieve a single byte or an array of data which is stored in a buffer. 
 
+## Syntax 
+```
+receivedVal = SPI.transfer(val)
+SPI.transfer(buffer, size) // C++ Format
+recivedBuff = SPI.transfer(buffer, size) // JavaScript Format
+``` 
+:::warning
+SPI.transfer16() currently hasn't been implemented
+:::
+
+## Parameters 
+
+***val***:   
+The byte to send out over the bus   
+
+***buffer***:   
+The array of data to be transferred   
+
+***size***:   
+Number of bytes to transfer   
+
+
+## Returns 
+The received data
 
 ## Example
 

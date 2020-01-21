@@ -1,5 +1,11 @@
 # Serial.peek()
 
+## Syntax 
+```
+Serial.peek()
+``` 
+
+## Returns 
 
 ## Example
 

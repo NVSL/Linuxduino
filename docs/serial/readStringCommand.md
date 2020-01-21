@@ -1,5 +1,18 @@
-# Serial.readStringCommand()
+# (extra) Serial.readStringCommand()
 
+## Syntax 
+```
+Serial.readStringCommand(terminator, buffer, length)
+``` 
+## Parameters 
+
+***terminator***:    
+
+***buffer***:   
+
+***length***:   
+
+## Returns
 
 ## Example
 

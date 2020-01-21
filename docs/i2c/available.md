@@ -1,16 +1,16 @@
-# Wire.read()
-Reads a byte that was transmitted from a slave device to a master after a call to [requestFrom()](/i2c/requestFrom) or was transmitted from a master to a slave.
+# Wire.available()
+Returns the number of bytes available for retrieval with read().
 
 ## Syntax 
 ```
-Wire.read()
+Wire.available()
 ``` 
 
 ## Parameters 
 None
 
-## Returns
-The next byte received.
+## Returns 
+The number of bytes available for reading. 
 
 ## Example
 

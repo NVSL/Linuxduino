@@ -11,7 +11,7 @@ features:
 - title: Arduino language compatible
   details: Use the same Arduino programing language style you already know.
 - title: IoT Enabled
-  details: Use C++ or the JavaScript version to enabling fast integration with the internet of things.
+  details: Use C++ or the JavaScript version to enable fast integration with the internet of things.
 footer: MIT Licensed | Copyright © 2019-present 
 ---
 

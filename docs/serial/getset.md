@@ -1,5 +1,29 @@
-# setSerial() & getSerial()
+# (extra) setSerial() & getSerial()
 
+## Syntax 
+```
+setSerial(serialPort)
+``` 
+
+## Parameters
+
+***serialPort***:   
+The device path of the serial port (e.g., "/dev/ttyUSB0").
+
+## Returns
+None
+
+## Syntax 
+```
+setSerialPort = getSerial()
+```
+
+## Parameters
+None
+
+## Returns
+
+Returns the current set serial port (e.g., "/dev/ttyUSB0") or empty string if no serial port is set.   
 
 ## Example
 

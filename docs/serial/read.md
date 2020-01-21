@@ -1,5 +1,11 @@
 # Serial.read()
 
+## Syntax 
+```
+Serial.read()
+``` 
+
+## Returns
 
 ## Example
 

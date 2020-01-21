@@ -1,5 +1,18 @@
 # Serial.findUntil()
 
+## Syntax 
+```
+Serial.findUntil(target, terminator)
+``` 
+
+## Parameters
+
+***target***:   
+
+***terminator***:   
+
+
+## Returns 
 
 ## Example
 

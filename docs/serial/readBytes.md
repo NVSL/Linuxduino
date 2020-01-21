@@ -1,5 +1,17 @@
 # Serial.readBytes()
 
+## Syntax 
+```
+Serial.readBytes(buffer, length)
+``` 
+## Parameters 
+
+***buffer***:   
+
+***length***:   
+
+
+## Returns
 
 ## Example
 

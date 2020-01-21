@@ -1,16 +1,22 @@
-# Wire.read()
-Reads a byte that was transmitted from a slave device to a master after a call to [requestFrom()](/i2c/requestFrom) or was transmitted from a master to a slave.
+# Wire.requestFrom() 
+Used by the master to request bytes from a slave device. The bytes may then be retrieved with the [available()](/i2c/available) and [read()](/i2c/read) functions.
 
 ## Syntax 
 ```
-Wire.read()
+Wire.requestFrom(address, quantity)
+(!) Wire.requestFrom(address, quantity, stop) // Not available, No way to send an I2C stop msg to the driver.
 ``` 
 
 ## Parameters 
-None
+
+***address***:    
+The 7-bit address of the device to request bytes from.
+
+***quantity***:    
+The number of bytes to request.
 
 ## Returns
-The next byte received.
+The number of bytes returned from the slave device.
 
 ## Example
 

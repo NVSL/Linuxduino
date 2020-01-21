@@ -1,4 +1,4 @@
-# setWire() & getWire()
+# (extra) setWire() & getWire()
 
 
 ## Example
