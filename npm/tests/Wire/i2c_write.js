@@ -14,6 +14,7 @@ const linuxduino = require('linuxduino');
   // Send Hello World! to device
   Wire.beginTransmission(8); // 7-bit device I2C address
   Wire.write("Hello");
+  Wire.write_byte(0x57); // W Ascii
   Wire.write(" ");
   Wire.write(world, world.length);
   var bytes_transmitted = Wire.endTransmission();

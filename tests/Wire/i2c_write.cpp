@@ -10,6 +10,7 @@ int main(void) {
     // Send Hello World! to device
     Wire.beginTransmission(8); // 7-bit device I2C address
     Wire.write("Hello");
+    Wire.write(0x57); // W Ascii
     Wire.write(' ');
     Wire.write(world, strlen(world));
     int bytes_transmitted = Wire.endTransmission();

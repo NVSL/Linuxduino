@@ -7,7 +7,7 @@ const linuxduino = require('linuxduino');
     
     // Set SPI device name
     linuxduino.setSPI("/dev/spidev0.0");
-    console.log(linuxduino.getSPI());
+    console.log("Current SPI Driver = ", linuxduino.getSPI());
 
     // Open SPI port
     SPI = new linuxduino.SPI();
