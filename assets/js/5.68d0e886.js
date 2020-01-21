@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[5],{203:function(t,n,e){"use strict";e.r(n);var s={name:"doublecode",props:{},data:function(){return{}},mounted:function(){},methods:{}},o=e(0),u=Object(o.a)(s,(function(){var t=this.$createElement;return(this._self._c||t)("div",[this._t("js"),this._v(" "),this._t("c")],2)}),[],!1,null,null,null);n.default=u.exports}}]);
