@@ -31,7 +31,7 @@
 
 // Max number of GPIO Pins available (Contact me if you need more pins)
 #ifndef SOC_GPIO_PINS
-  #define SOC_GPIO_PINS 256
+  #define SOC_GPIO_PINS 255
 #endif
 
 // Remove some PROGMEM space macros if possible

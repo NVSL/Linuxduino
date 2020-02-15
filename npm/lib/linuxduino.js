@@ -1134,11 +1134,11 @@ function updateGlobalBufferViews() {
 
 
 var STATIC_BASE = 1024,
-    STACK_BASE = 18096,
+    STACK_BASE = 23680,
     STACKTOP = STACK_BASE,
-    STACK_MAX = 5260976,
-    DYNAMIC_BASE = 5260976,
-    DYNAMICTOP_PTR = 18064;
+    STACK_MAX = 5266560,
+    DYNAMIC_BASE = 5266560,
+    DYNAMICTOP_PTR = 23648;
 
 assert(STACK_BASE % 16 === 0, 'stack must start aligned');
 assert(DYNAMIC_BASE % 16 === 0, 'heap must start aligned');
@@ -1560,6 +1560,7 @@ function createWasm(env) {
       abort(reason);
     });
   }
+/*
   // Prefer streaming instantiation if available.
   if (!Module['wasmBinary'] &&
       typeof WebAssembly.instantiateStreaming === 'function' &&
@@ -1576,6 +1577,8 @@ function createWasm(env) {
   } else {
     instantiateArrayBuffer(receiveInstantiatedSource);
   }
+*/ 
+  instantiateArrayBuffer(receiveInstantiatedSource);
   return {}; // no exports yet; we'll fill them in later
 }
 
@@ -1615,7 +1618,7 @@ function _emscripten_asm_const_i(code) {
 
 
 
-// STATICTOP = STATIC_BASE + 17072;
+// STATICTOP = STATIC_BASE + 22656;
 /* global initializers */  __ATINIT__.push({ func: function() { globalCtors() } });
 
 
@@ -1626,7 +1629,7 @@ function _emscripten_asm_const_i(code) {
 
 
 /* no memory initializer */
-var tempDoublePtr = 18080
+var tempDoublePtr = 23664
 assert(tempDoublePtr % 8 == 0);
 
 function copyTempFloat(ptr) { // functions, because inlining this code increases code size too much
